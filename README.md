@@ -166,6 +166,22 @@ The system is built on a well-normalized relational database with these core mod
    - Main interface: http://127.0.0.1:8000/
    - Admin interface: http://127.0.0.1:8000/admin/
 
+### Default Login Credentials
+
+#### Administrator Access
+- **Username:** amanya
+- **Password:** amanya@256
+- **Access:** Full system administration with all privileges
+- **URL:** http://127.0.0.1:8000/admin/ or http://127.0.0.1:8000/
+
+#### Patient Portal Access
+- **Username:** abaho
+- **Password:** amanya@256
+- **Access:** Patient dashboard and health management features
+- **URL:** http://127.0.0.1:8000/ (will redirect to patient dashboard after login)
+
+*Note: For security reasons, please change these default passwords after initial login.*
+
 ### Configuration Options
 The system can be configured through the admin interface or by editing these files:
 - `settings.py`: Core Django settings
