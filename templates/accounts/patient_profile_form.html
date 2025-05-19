@@ -1,0 +1,236 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Update Patient Profile - Smart Clinic{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/forms.css' %}">
+<style>
+    .form-container {
+        max-width: 800px;
+        margin: 2rem auto;
+        padding: 2rem;
+        background: var(--card-bg);
+        border-radius: var(--card-radius);
+        box-shadow: var(--card-shadow);
+    }
+    
+    .form-title {
+        margin-bottom: 1.5rem;
+        color: var(--primary-color);
+        font-size: 1.8rem;
+        font-weight: 600;
+    }
+    
+    .form-description {
+        margin-bottom: 2rem;
+        color: var(--text-muted);
+    }
+    
+    .form-row {
+        display: flex;
+        flex-wrap: wrap;
+        margin: 0 -1rem;
+    }
+    
+    .form-group {
+        padding: 0 1rem;
+        margin-bottom: 1.5rem;
+        flex: 1 0 100%;
+    }
+    
+    @media (min-width: 768px) {
+        .form-group.half {
+            flex: 0 0 50%;
+        }
+    }
+    
+    .form-footer {
+        margin-top: 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="content-wrapper">
+    <div class="page-header">
+        <h1 class="page-title">Update Patient Profile</h1>
+        <div class="breadcrumb">
+            <a href="{% url 'dashboard:index' %}">Dashboard</a>
+            <span class="separator">/</span>
+            <span>Update Profile</span>
+        </div>
+    </div>
+
+    <div class="form-container slide-up">
+        <h2 class="form-title">Personal Information</h2>
+        <p class="form-description">Please update your personal and medical information below. This information will be used by healthcare providers to better serve you.</p>
+        
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+            <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <div class="form-row">
+                <div class="form-group half">
+                    <label for="{{ form.first_name.id_for_label }}">First Name</label>
+                    {{ form.first_name }}
+                    {% if form.first_name.errors %}
+                    <div class="form-error">{{ form.first_name.errors.0 }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group half">
+                    <label for="{{ form.last_name.id_for_label }}">Last Name</label>
+                    {{ form.last_name }}
+                    {% if form.last_name.errors %}
+                    <div class="form-error">{{ form.last_name.errors.0 }}</div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group half">
+                    <label for="{{ form.date_of_birth.id_for_label }}">Date of Birth</label>
+                    {{ form.date_of_birth }}
+                    {% if form.date_of_birth.errors %}
+                    <div class="form-error">{{ form.date_of_birth.errors.0 }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group half">
+                    <label for="{{ form.gender.id_for_label }}">Gender</label>
+                    {{ form.gender }}
+                    {% if form.gender.errors %}
+                    <div class="form-error">{{ form.gender.errors.0 }}</div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="{{ form.email.id_for_label }}">Email Address</label>
+                    {{ form.email }}
+                    {% if form.email.errors %}
+                    <div class="form-error">{{ form.email.errors.0 }}</div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group half">
+                    <label for="{{ form.phone.id_for_label }}">Phone Number</label>
+                    {{ form.phone }}
+                    {% if form.phone.errors %}
+                    <div class="form-error">{{ form.phone.errors.0 }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group half">
+                    <label for="{{ form.emergency_contact.id_for_label }}">Emergency Contact</label>
+                    {{ form.emergency_contact }}
+                    {% if form.emergency_contact.errors %}
+                    <div class="form-error">{{ form.emergency_contact.errors.0 }}</div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="{{ form.address.id_for_label }}">Address</label>
+                    {{ form.address }}
+                    {% if form.address.errors %}
+                    <div class="form-error">{{ form.address.errors.0 }}</div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <h3 class="section-title mt-4">Medical Information</h3>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="{{ form.allergies.id_for_label }}">Allergies</label>
+                    {{ form.allergies }}
+                    <small class="form-help">List any allergies you have (medications, food, etc.)</small>
+                    {% if form.allergies.errors %}
+                    <div class="form-error">{{ form.allergies.errors.0 }}</div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="{{ form.medical_conditions.id_for_label }}">Medical Conditions</label>
+                    {{ form.medical_conditions }}
+                    <small class="form-help">List any chronic conditions, previous surgeries or relevant medical history</small>
+                    {% if form.medical_conditions.errors %}
+                    <div class="form-error">{{ form.medical_conditions.errors.0 }}</div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="{{ form.current_medications.id_for_label }}">Current Medications</label>
+                    {{ form.current_medications }}
+                    <small class="form-help">List medications you're currently taking</small>
+                    {% if form.current_medications.errors %}
+                    <div class="form-error">{{ form.current_medications.errors.0 }}</div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="form-footer">
+                <a href="{% url 'dashboard:index' %}" class="btn btn-outline">Cancel</a>
+                <button type="submit" class="btn btn-primary water-ripple">
+                    <i class="fas fa-save"></i> Save Profile
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Add ripple effect to buttons
+    document.querySelectorAll('.water-ripple').forEach(button => {
+        button.addEventListener('click', function(e) {
+            const rect = button.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            const ripple = document.createElement('span');
+            ripple.style.cssText = `
+                position: absolute;
+                background: rgba(255, 255, 255, 0.7);
+                border-radius: 50%;
+                pointer-events: none;
+                width: 10px;
+                height: 10px;
+                top: ${y}px;
+                left: ${x}px;
+                transform: translate(-50%, -50%) scale(0);
+                animation: ripple 0.6s linear;
+            `;
+            
+            button.appendChild(ripple);
+            
+            setTimeout(() => {
+                ripple.remove();
+            }, 600);
+        });
+    });
+</script>
+{% endblock %}

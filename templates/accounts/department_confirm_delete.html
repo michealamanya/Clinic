@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Delete Department - Smart Clinic{% endblock %}
+
+{% block content %}
+<div class="card slide-up">
+    <div class="card-header">
+        <h1 class="card-title">Delete Department</h1>
+    </div>
+    
+    <div class="confirmation-content">
+        <p>Are you sure you want to delete the department "{{ department.name }}"?</p>
+        
+        <div class="alert alert-warning">
+            <i class="fas fa-exclamation-triangle"></i> This action cannot be undone. All department information will be permanently deleted.
+        </div>
+        
+        <form method="post">
+            {% csrf_token %}
+            <div class="button-group">
+                <button type="submit" class="btn btn-danger water-ripple">
+                    <i class="fas fa-trash"></i> Delete Department
+                </button>
+                <a href="{% url 'accounts:department_detail' department.pk %}" class="btn btn-outline">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Add ripple effect to button
+    document.querySelectorAll('.water-ripple').forEach(button => {
+        button.addEventListener('click', function(e) {
+            const rect = button.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            const ripple = document.createElement('span');
+            ripple.style.cssText = `
+                position: absolute;
+                background: rgba(255, 255, 255, 0.7);
+                border-radius: 50%;
+                pointer-events: none;
+                width: 10px;
+                height: 10px;
+                top: ${y}px;
+                left: ${x}px;
+                transform: translate(-50%, -50%) scale(0);
+                animation: ripple 0.6s linear;
+            `;
+            
+            button.appendChild(ripple);
+            
+            setTimeout(() => {
+                ripple.remove();
+            }, 600);
+        });
+    });
+</script>
+{% endblock %}

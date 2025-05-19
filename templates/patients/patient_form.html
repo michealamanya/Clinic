@@ -1,0 +1,304 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+    {% if patient %}Edit Patient: {{ patient }}{% else %}New Patient{% endif %}
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/patients.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="card slide-up">
+    <div class="card-header">
+        <h1 class="card-title">
+            {% if patient %}
+                Edit Patient
+            {% else %}
+                New Patient
+            {% endif %}
+        </h1>
+    </div>
+    
+    <form method="post" class="patient-form slide-up" style="animation-delay: 0.1s;">
+        {% csrf_token %}
+        
+        {% if form.errors %}
+        <div class="alert alert-danger">
+            Please correct the errors below.
+        </div>
+        {% endif %}
+        
+        <h2 class="form-section-title">Personal Information</h2>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="{{ form.first_name.id_for_label }}" class="form-label">First Name</label>
+                    {{ form.first_name }}
+                    {% if form.first_name.errors %}
+                    <ul class="errorlist">
+                        {% for error in form.first_name.errors %}
+                        <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="{{ form.last_name.id_for_label }}" class="form-label">Last Name</label>
+                    {{ form.last_name }}
+                    {% if form.last_name.errors %}
+                    <ul class="errorlist">
+                        {% for error in form.last_name.errors %}
+                        <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="{{ form.date_of_birth.id_for_label }}" class="form-label">Date of Birth</label>
+                    {{ form.date_of_birth }}
+                    {% if form.date_of_birth.errors %}
+                    <ul class="errorlist">
+                        {% for error in form.date_of_birth.errors %}
+                        <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="{{ form.gender.id_for_label }}" class="form-label">Gender</label>
+                    {{ form.gender }}
+                    {% if form.gender.errors %}
+                    <ul class="errorlist">
+                        {% for error in form.gender.errors %}
+                        <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="{{ form.phone.id_for_label }}" class="form-label">Phone</label>
+                    {{ form.phone }}
+                    {% if form.phone.errors %}
+                    <ul class="errorlist">
+                        {% for error in form.phone.errors %}
+                        <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="{{ form.email.id_for_label }}" class="form-label">Email</label>
+                    {{ form.email }}
+                    {% if form.email.errors %}
+                    <ul class="errorlist">
+                        {% for error in form.email.errors %}
+                        <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label for="{{ form.address.id_for_label }}" class="form-label">Address</label>
+            {{ form.address }}
+            {% if form.address.errors %}
+            <ul class="errorlist">
+                {% for error in form.address.errors %}
+                <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+        </div>
+        
+        <h2 class="form-section-title">Medical Information</h2>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="{{ form.blood_type.id_for_label }}" class="form-label">Blood Type</label>
+                    {{ form.blood_type }}
+                    {% if form.blood_type.errors %}
+                    <ul class="errorlist">
+                        {% for error in form.blood_type.errors %}
+                        <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="{{ form.allergies.id_for_label }}" class="form-label">Allergies</label>
+                    {{ form.allergies }}
+                    {% if form.allergies.errors %}
+                    <ul class="errorlist">
+                        {% for error in form.allergies.errors %}
+                        <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label for="{{ form.medical_conditions.id_for_label }}" class="form-label">Medical Conditions</label>
+            {{ form.medical_conditions }}
+            {% if form.medical_conditions.errors %}
+            <ul class="errorlist">
+                {% for error in form.medical_conditions.errors %}
+                <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+        </div>
+        
+        <h2 class="form-section-title">Emergency Contact</h2>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="{{ form.emergency_contact_name.id_for_label }}" class="form-label">Contact Name</label>
+                    {{ form.emergency_contact_name }}
+                    {% if form.emergency_contact_name.errors %}
+                    <ul class="errorlist">
+                        {% for error in form.emergency_contact_name.errors %}
+                        <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="{{ form.emergency_contact_phone.id_for_label }}" class="form-label">Contact Phone</label>
+                    {{ form.emergency_contact_phone }}
+                    {% if form.emergency_contact_phone.errors %}
+                    <ul class="errorlist">
+                        {% for error in form.emergency_contact_phone.errors %}
+                        <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label for="{{ form.emergency_contact_relationship.id_for_label }}" class="form-label">Relationship</label>
+            {{ form.emergency_contact_relationship }}
+            {% if form.emergency_contact_relationship.errors %}
+            <ul class="errorlist">
+                {% for error in form.emergency_contact_relationship.errors %}
+                <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+        </div>
+        
+        <h2 class="form-section-title">Insurance Information</h2>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="{{ form.insurance_provider.id_for_label }}" class="form-label">Insurance Provider</label>
+                    {{ form.insurance_provider }}
+                    {% if form.insurance_provider.errors %}
+                    <ul class="errorlist">
+                        {% for error in form.insurance_provider.errors %}
+                        <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="{{ form.insurance_policy_number.id_for_label }}" class="form-label">Policy Number</label>
+                    {{ form.insurance_policy_number }}
+                    {% if form.insurance_policy_number.errors %}
+                    <ul class="errorlist">
+                        {% for error in form.insurance_policy_number.errors %}
+                        <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="form-group mt-4">
+            <button type="submit" class="btn btn-primary water-ripple">
+                {% if patient %}
+                    Save Changes
+                {% else %}
+                    Create Patient
+                {% endif %}
+            </button>
+            <a href="{% url 'patients:list' %}" class="btn btn-outline">
+                Cancel
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Add ripple effect to button
+    document.querySelectorAll('.water-ripple').forEach(button => {
+        button.addEventListener('click', function(e) {
+            const rect = button.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            const ripple = document.createElement('span');
+            ripple.style.cssText = `
+                position: absolute;
+                background: rgba(255, 255, 255, 0.7);
+                border-radius: 50%;
+                pointer-events: none;
+                width: 10px;
+                height: 10px;
+                top: ${y}px;
+                left: ${x}px;
+                transform: translate(-50%, -50%) scale(0);
+                animation: ripple 0.6s linear;
+            `;
+            
+            button.appendChild(ripple);
+            
+            setTimeout(() => {
+                ripple.remove();
+            }, 600);
+        });
+    });
+</script>
+{% endblock %}

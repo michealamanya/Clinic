@@ -1,0 +1,174 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ title }} - Smart Clinic{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/patient-portal.css' %}">
+<style>
+    .medical-record {
+        background: var(--glass-bg);
+        backdrop-filter: blur(12px);
+        border: 1px solid var(--glass-border);
+        border-radius: var(--border-radius);
+        margin-bottom: 1.5rem;
+        transition: all var(--transition-speed) cubic-bezier(0.2, 0.8, 0.2, 1);
+        overflow: hidden;
+    }
+    
+    .medical-record:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--hover-shadow);
+    }
+    
+    .record-header {
+        background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary-dark) 100%);
+        color: white;
+        padding: 1rem 1.5rem;
+        font-weight: 600;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .record-date {
+        font-size: 0.9rem;
+        opacity: 0.9;
+    }
+    
+    .record-content {
+        padding: 1.5rem;
+    }
+    
+    .doctor-info {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+    
+    .record-meta {
+        margin-bottom: 1.5rem;
+        color: var(--secondary-color);
+    }
+    
+    .record-meta strong {
+        color: var(--dark-color);
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 3rem;
+        background-color: #f8f9fa;
+        border-radius: var(--border-radius);
+        margin: 2rem 0;
+    }
+    
+    .empty-state i {
+        font-size: 3rem;
+        color: var(--secondary-color);
+        margin-bottom: 1rem;
+    }
+    
+    .empty-state-title {
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+        color: var(--dark-color);
+    }
+    
+    .empty-state-description {
+        color: var(--secondary-color);
+        max-width: 500px;
+        margin: 0 auto;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="page-title">Medical History</h1>
+        <div>
+            <a href="{% url 'dashboard:index' %}" class="btn btn-outline-primary">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+    </div>
+    
+    <div class="patient-info-card mb-4">
+        <h3>{{ patient.first_name }} {{ patient.last_name }}</h3>
+        {% if patient.date_of_birth %}
+        <p><strong>Date of Birth:</strong> {{ patient.date_of_birth|date:"F d, Y" }}</p>
+        {% endif %}
+        {% if patient.blood_type %}
+        <p><strong>Blood Type:</strong> {{ patient.blood_type }}</p>
+        {% endif %}
+    </div>
+    
+    {% if medical_records %}
+        <div class="records-container">
+            {% for record in medical_records %}
+                <div class="medical-record">
+                    <div class="record-header">
+                        <div class="record-title">{{ record.diagnosis }}</div>
+                        <div class="record-date">{{ record.date|date:"F d, Y" }}</div>
+                    </div>
+                    <div class="record-content">
+                        {% if record.doctor %}
+                        <div class="doctor-info">
+                            <div class="doctor-avatar">
+                                {{ record.doctor.user.first_name|first }}{{ record.doctor.user.last_name|first }}
+                            </div>
+                            <div>
+                                <div class="doctor-name">Dr. {{ record.doctor.user.get_full_name }}</div>
+                                {% if record.doctor.specialization %}
+                                <div class="doctor-specialty">{{ record.doctor.specialization }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        <div class="record-meta">
+                            {% if record.symptoms %}
+                            <p><strong>Symptoms:</strong> {{ record.symptoms }}</p>
+                            {% endif %}
+                            {% if record.treatment %}
+                            <p><strong>Treatment:</strong> {{ record.treatment }}</p>
+                            {% endif %}
+                        </div>
+                        
+                        {% if record.notes %}
+                        <div class="record-notes">
+                            <h5>Notes</h5>
+                            <p>{{ record.notes }}</p>
+                        </div>
+                        {% endif %}
+                        
+                        {% if record.attachments %}
+                        <div class="record-attachments mt-3">
+                            <h5>Attachments</h5>
+                            <div class="attachment-list">
+                                {% for attachment in record.attachments.all %}
+                                <a href="{{ attachment.file.url }}" class="attachment-item" target="_blank">
+                                    <i class="fas fa-paperclip"></i> {{ attachment.name }}
+                                </a>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <i class="fas fa-file-medical"></i>
+            <h3 class="empty-state-title">No Medical Records Found</h3>
+            <p class="empty-state-description">
+                Your medical history records will appear here once your doctor has added them to your profile.
+            </p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{{ system_settings.clinic_name }}{% endblock %}</title>
+    
+    <!-- Dynamic CSS variables from settings -->
+    <style>
+        {{ dynamic_css_variables|safe }}
+        
+        /* Apply dark mode if enabled */
+        {% if system_settings.enable_dark_mode %}
+        :root {
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --text-color: #e0e0e0;
+            --light-text: #aaaaaa;
+            --border-color: #333333;
+        }
+        {% endif %}
+        
+        /* Custom CSS from system settings */
+        {{ system_settings.custom_css|safe }}
+    </style>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/static/css/main.css">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <nav class="navbar">
+                <a href="/" class="logo">
+                    {% if system_settings.clinic_logo %}
+                    <img src="{{ system_settings.clinic_logo.url }}" alt="{{ system_settings.clinic_name }}">
+                    {% else %}
+                    <i class="fas fa-heartbeat"></i>
+                    <span>{{ system_settings.clinic_name }}</span>
+                    {% endif %}
+                </a>
+                
+                <div class="menu-toggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+                
+                <ul class="nav-links">
+                    {% if user.is_authenticated %}
+                        <li><a href="{% url 'dashboard:index' %}" class="{% if request.path == '/dashboard/' %}active{% endif %}">Dashboard</a></li>
+                        <li><a href="{% url 'appointments:list' %}" class="{% if '/appointments/' in request.path %}active{% endif %}">Appointments</a></li>
+                        <li><a href="{% url 'patients:list' %}" class="{% if '/patients/' in request.path %}active{% endif %}">Patients</a></li>
+                        {% if user.is_staff %}
+                            <li><a href="{% url 'accounts:department_list' %}" class="{% if '/departments/' in request.path %}active{% endif %}">Departments</a></li>
+                            <li><a href="/admin/" target="_blank">Admin</a></li>
+                            <li><a href="{% url 'accounts:settings' %}" class="{% if '/accounts/settings/' in request.path %}active{% endif %}">
+                                <i class="fas fa-cogs"></i> Settings
+                            </a></li>
+                        {% endif %}
+                        <li><a href="{% url 'accounts:profile' %}" class="{% if '/accounts/profile/' in request.path %}active{% endif %}">Profile</a></li>
+                        <li>
+                            <form id="logout-form" action="{% url 'logout' %}" method="post" style="display: none;">
+                                {% csrf_token %}
+                            </form>
+                            <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" class="logout-link">
+                                <i class="fas fa-sign-out-alt"></i> Logout
+                            </a>
+                        </li>
+                    {% else %}
+                        <li><a href="{% url 'login' %}" class="{% if '/accounts/login/' in request.path %}active{% endif %}">Login</a></li>
+                        <li><a href="{% url 'accounts:register' %}" class="{% if '/accounts/register/' in request.path %}active{% endif %}">Register</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </header>
+    
+    <div class="alerts-container">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    </div>
+    
+    <main class="main-content">
+        <div class="container">
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+    
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div>
+                    <p>&copy; {% now "Y" %} Smart Clinic. All rights reserved.</p>
+                </div>
+                <div class="footer-links">
+                    <a href="{% url 'privacy_policy' %}">Privacy Policy</a>
+                    <a href="{% url 'terms_of_service' %}">Terms of Service</a>
+                    <a href="{% url 'contact_us' %}">Contact</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+    <script>
+        // Mobile menu toggle
+        document.querySelector('.menu-toggle').addEventListener('click', function() {
+            document.querySelector('.nav-links').classList.toggle('show');
+        });
+        
+        // Auto-hide alerts after 5 seconds
+        setTimeout(function() {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function(alert) {
+                alert.style.display = 'none';
+            });
+        }, 5000);
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

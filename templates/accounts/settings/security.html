@@ -1,0 +1,202 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Security Settings - Smart Clinic{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/settings.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="settings-container">
+    <div class="settings-sidebar">
+        <h3 class="settings-nav-title">Settings</h3>
+        <ul class="settings-nav">
+            <li class="settings-nav-item">
+                <a href="{% url 'accounts:settings' %}">
+                    <i class="fas fa-home"></i> Overview
+                </a>
+            </li>
+            <li class="settings-nav-item">
+                <a href="{% url 'accounts:settings_general' %}">
+                    <i class="fas fa-sliders-h"></i> General
+                </a>
+            </li>
+            <li class="settings-nav-item">
+                <a href="{% url 'accounts:settings_appearance' %}">
+                    <i class="fas fa-palette"></i> Appearance
+                </a>
+            </li>
+            <li class="settings-nav-item">
+                <a href="{% url 'accounts:settings_notifications' %}">
+                    <i class="fas fa-bell"></i> Notifications
+                </a>
+            </li>
+            <li class="settings-nav-item active">
+                <a href="{% url 'accounts:settings_security' %}">
+                    <i class="fas fa-shield-alt"></i> Security
+                </a>
+            </li>
+        </ul>
+    </div>
+    
+    <div class="settings-content">
+        <h1 class="settings-title">Security Settings</h1>
+        
+        <div class="settings-form-container">
+            <form method="post" class="settings-form">
+                {% csrf_token %}
+                
+                <div class="settings-section">
+                    <h2 class="settings-section-title">Maintenance Mode</h2>
+                    
+                    <div class="setting-field checkbox-field">
+                        <div class="toggle-switch">
+                            <input type="checkbox" id="maintenance_mode" name="maintenance_mode" 
+                                   {% if settings.maintenance_mode|default:False %}checked{% endif %}>
+                            <label for="maintenance_mode" class="toggle-label"></label>
+                        </div>
+                        <label for="maintenance_mode">Enable Maintenance Mode</label>
+                        <div class="field-help">When enabled, only staff members can access the site</div>
+                    </div>
+                    
+                    <div class="setting-field">
+                        <label for="maintenance_message">Maintenance Message</label>
+                        <textarea id="maintenance_message" name="maintenance_message" class="form-control" rows="3">{{ settings.maintenance_message|default:"We're currently updating our system. Please check back later." }}</textarea>
+                        <div class="field-help">Message to display to users during maintenance</div>
+                    </div>
+                </div>
+                
+                <div class="settings-section">
+                    <h2 class="settings-section-title">Password Policy</h2>
+                    
+                    <div class="setting-field">
+                        <label for="password_min_length">Minimum Password Length</label>
+                        <input type="number" id="password_min_length" name="password_min_length" class="form-control" value="{{ settings.password_min_length|default:8 }}" min="6" max="20">
+                    </div>
+                    
+                    <div class="setting-field checkbox-field">
+                        <div class="toggle-switch">
+                            <input type="checkbox" id="password_require_uppercase" name="password_require_uppercase" 
+                                   {% if settings.password_require_uppercase|default:True %}checked{% endif %}>
+                            <label for="password_require_uppercase" class="toggle-label"></label>
+                        </div>
+                        <label for="password_require_uppercase">Require Uppercase Letters</label>
+                    </div>
+                    
+                    <div class="setting-field checkbox-field">
+                        <div class="toggle-switch">
+                            <input type="checkbox" id="password_require_special" name="password_require_special" 
+                                   {% if settings.password_require_special|default:True %}checked{% endif %}>
+                            <label for="password_require_special" class="toggle-label"></label>
+                        </div>
+                        <label for="password_require_special">Require Special Characters</label>
+                    </div>
+                    
+                    <div class="setting-field">
+                        <label for="password_expiry_days">Password Expiry (days)</label>
+                        <input type="number" id="password_expiry_days" name="password_expiry_days" class="form-control" value="{{ settings.password_expiry_days|default:90 }}" min="0" max="365">
+                        <div class="field-help">Days until password expires (0 = never)</div>
+                    </div>
+                </div>
+                
+                <div class="settings-section">
+                    <h2 class="settings-section-title">Session Settings</h2>
+                    
+                    <div class="setting-field">
+                        <label for="session_timeout_minutes">Session Timeout (minutes)</label>
+                        <input type="number" id="session_timeout_minutes" name="session_timeout_minutes" class="form-control" value="{{ settings.session_timeout_minutes|default:30 }}" min="5" max="120">
+                        <div class="field-help">Minutes of inactivity before a user is logged out</div>
+                    </div>
+                    
+                    <div class="setting-field checkbox-field">
+                        <div class="toggle-switch">
+                            <input type="checkbox" id="allow_remember_me" name="allow_remember_me" 
+                                   {% if settings.allow_remember_me|default:True %}checked{% endif %}>
+                            <label for="allow_remember_me" class="toggle-label"></label>
+                        </div>
+                        <label for="allow_remember_me">Allow "Remember Me" Function</label>
+                    </div>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary water-ripple">
+                        <i class="fas fa-save"></i> Save Changes
+                    </button>
+                    
+                    {% if user.is_superuser %}
+                    <button type="button" id="debug-btn" class="btn btn-outline">
+                        <i class="fas fa-bug"></i> Debug Settings
+                    </button>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+        
+        {% if user.is_superuser %}
+        <div class="debug-info" style="margin-top: 2rem; display: none;">
+            <h3>Debug Information</h3>
+            <pre id="debug-output" style="background: #f5f5f5; padding: 1rem; border-radius: 4px; overflow: auto; max-height: 300px;">
+Settings object: {{ settings|default:"None" }}
+            </pre>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Add ripple effect to button
+    document.querySelectorAll('.water-ripple').forEach(button => {
+        button.addEventListener('click', function(e) {
+            const rect = button.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            const ripple = document.createElement('span');
+            ripple.style.cssText = `
+                position: absolute;
+                background: rgba(255, 255, 255, 0.7);
+                border-radius: 50%;
+                pointer-events: none;
+                width: 10px;
+                height: 10px;
+                top: ${y}px;
+                left: ${x}px;
+                transform: translate(-50%, -50%) scale(0);
+                animation: ripple 0.6s linear;
+            `;
+            
+            button.appendChild(ripple);
+            
+            setTimeout(() => {
+                ripple.remove();
+            }, 600);
+        });
+    });
+    
+    // Debug button functionality
+    const debugBtn = document.getElementById('debug-btn');
+    if (debugBtn) {
+        debugBtn.addEventListener('click', function() {
+            const debugInfo = document.querySelector('.debug-info');
+            debugInfo.style.display = debugInfo.style.display === 'none' ? 'block' : 'none';
+            
+            // Make AJAX call to get current settings status
+            fetch('/accounts/api/debug-settings/', {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('debug-output').textContent = JSON.stringify(data, null, 2);
+            })
+            .catch(error => {
+                console.error('Error fetching debug info:', error);
+            });
+        });
+    }
+</script>
+{% endblock %}

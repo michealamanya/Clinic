@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maintenance - Smart Clinic</title>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --background-color: #f8f9fa;
+            --text-color: #333;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+        
+        .maintenance-container {
+            max-width: 600px;
+            padding: 2rem;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .maintenance-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(to right, var(--primary-color), #2980b9);
+        }
+        
+        h1 {
+            color: var(--primary-color);
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        p {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+        }
+        
+        .icon {
+            font-size: 5rem;
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+        }
+        
+        .login-link {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            background-color: var(--primary-color);
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .login-link:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(52, 152, 219, 0.3);
+        }
+        
+        .waves {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 15vh;
+            /* Using CSS for waves instead of SVG */
+            background: linear-gradient(to bottom, transparent, rgba(52, 152, 219, 0.1));
+            opacity: 0.8;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="maintenance-container">
+        <div class="icon">
+            <i class="fas fa-tools"></i>
+        </div>
+        <h1>Maintenance in Progress</h1>
+        <p>{{ maintenance_message }}</p>
+        <a href="{% url 'login' %}" class="login-link">Staff Login</a>
+        <p>AMANYA MICHEAL</p>
+    </div>
+    
+    <div class="waves"></div>
+    
+    <script>
+        // Animated water effect
+        document.addEventListener('DOMContentLoaded', function() {
+            const waves = document.querySelector('.waves');
+            
+            function createRipple() {
+                const ripple = document.createElement('div');
+                ripple.style.cssText = `
+                    position: absolute;
+                    width: 20px;
+                    height: 20px;
+                    background: rgba(52, 152, 219, 0.3);
+                    border-radius: 50%;
+                    left: ${Math.random() * 100}%;
+                    bottom: ${Math.random() * 100}%;
+                    animation: ripple 3s linear;
+                    opacity: 0.7;
+                `;
+                
+                waves.appendChild(ripple);
+                
+                setTimeout(() => {
+                    ripple.remove();
+                }, 3000);
+            }
+            
+            // Create initial ripples
+            for (let i = 0; i < 5; i++) {
+                setTimeout(createRipple, i * 300);
+            }
+            
+            // Continue creating ripples
+            setInterval(createRipple, 700);
+            
+            // Add ripple animation
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes ripple {
+                    0% {
+                        transform: scale(0);
+                        opacity: 0.7;
+                    }
+                    100% {
+                        transform: scale(20);
+                        opacity: 0;
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+        });
+    </script>
+</body>
+</html>

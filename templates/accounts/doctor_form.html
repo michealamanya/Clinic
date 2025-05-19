@@ -1,0 +1,188 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ title }} - Smart Clinic{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/forms.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="form-header">
+        <h1 class="form-title slide-up">{{ title }}</h1>
+        <p class="form-subtitle slide-up" style="animation-delay: 0.1s;">
+            Create a new doctor account in the system
+        </p>
+    </div>
+    
+    <div class="form-container slide-up" style="animation-delay: 0.2s;">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h3>Account Information</h3>
+                </div>
+                <div class="card-body">
+                    {% if user_form.errors %}
+                    <div class="alert alert-danger">
+                        <p>Please correct the errors below:</p>
+                        {{ user_form.errors }}
+                    </div>
+                    {% endif %}
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ user_form.username.id_for_label }}">Username</label>
+                                {{ user_form.username }}
+                                {% if user_form.username.errors %}
+                                <div class="error">{{ user_form.username.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ user_form.first_name.id_for_label }}">First Name</label>
+                                {{ user_form.first_name }}
+                                {% if user_form.first_name.errors %}
+                                <div class="error">{{ user_form.first_name.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ user_form.last_name.id_for_label }}">Last Name</label>
+                                {{ user_form.last_name }}
+                                {% if user_form.last_name.errors %}
+                                <div class="error">{{ user_form.last_name.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ user_form.email.id_for_label }}">Email</label>
+                                {{ user_form.email }}
+                                {% if user_form.email.errors %}
+                                <div class="error">{{ user_form.email.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ user_form.password1.id_for_label }}">Password</label>
+                                {{ user_form.password1 }}
+                                {% if user_form.password1.errors %}
+                                <div class="error">{{ user_form.password1.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ user_form.password2.id_for_label }}">Confirm Password</label>
+                                {{ user_form.password2 }}
+                                {% if user_form.password2.errors %}
+                                <div class="error">{{ user_form.password2.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h3>Doctor Information</h3>
+                </div>
+                <div class="card-body">
+                    {% if profile_form.errors %}
+                    <div class="alert alert-danger">
+                        <p>Please correct the errors below:</p>
+                        {{ profile_form.errors }}
+                    </div>
+                    {% endif %}
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ profile_form.department.id_for_label }}">Department</label>
+                                {{ profile_form.department }}
+                                {% if profile_form.department.errors %}
+                                <div class="error">{{ profile_form.department.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ profile_form.specialization.id_for_label }}">Specialization</label>
+                                {{ profile_form.specialization }}
+                                {% if profile_form.specialization.errors %}
+                                <div class="error">{{ profile_form.specialization.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ profile_form.phone.id_for_label }}">Phone</label>
+                                {{ profile_form.phone }}
+                                {% if profile_form.phone.errors %}
+                                <div class="error">{{ profile_form.phone.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="{{ profile_form.address.id_for_label }}">Address</label>
+                        {{ profile_form.address }}
+                        {% if profile_form.address.errors %}
+                        <div class="error">{{ profile_form.address.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="{{ profile_form.bio.id_for_label }}">Biography</label>
+                        {{ profile_form.bio }}
+                        {% if profile_form.bio.errors %}
+                        <div class="error">{{ profile_form.bio.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="{{ profile_form.profile_picture.id_for_label }}">Profile Picture</label>
+                        {{ profile_form.profile_picture }}
+                        {% if profile_form.profile_picture.errors %}
+                        <div class="error">{{ profile_form.profile_picture.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Create Doctor
+                </button>
+                <a href="{% url 'dashboard:index' %}" class="btn btn-outline">
+                    <i class="fas fa-times"></i> Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

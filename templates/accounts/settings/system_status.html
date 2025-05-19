@@ -1,0 +1,498 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}System Status - Smart Clinic{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/settings.css' %}">
+<style>
+    .metric-card {
+        background-color: var(--card-bg);
+        border-radius: var(--border-radius);
+        box-shadow: var(--card-shadow);
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .metric-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+    
+    .metric-title {
+        font-size: 1.25rem;
+        margin: 0;
+    }
+    
+    .refresh-button {
+        background: none;
+        border: none;
+        color: var(--primary-color);
+        cursor: pointer;
+    }
+    
+    .metrics-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 1rem;
+    }
+    
+    .metric-item {
+        background-color: var(--bg-color);
+        border-radius: var(--border-radius);
+        padding: 1rem;
+        border: 1px solid var(--border-color);
+    }
+    
+    .metric-label {
+        font-size: 0.85rem;
+        color: var(--light-text);
+        margin-bottom: 0.5rem;
+    }
+    
+    .metric-value {
+        font-size: 1.5rem;
+        font-weight: 600;
+    }
+    
+    .gauge-container {
+        position: relative;
+        height: 120px;
+        margin-bottom: 1rem;
+    }
+    
+    .gauge {
+        width: 100%;
+        height: 100%;
+    }
+    
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    .data-table th, .data-table td {
+        padding: 0.75rem 1rem;
+        text-align: left;
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    .data-table th {
+        background-color: rgba(52, 152, 219, 0.05);
+        font-weight: 500;
+    }
+    
+    .log-container {
+        height: 300px;
+        overflow-y: auto;
+        background-color: #1a1a1a;
+        color: #f0f0f0;
+        font-family: monospace;
+        padding: 1rem;
+        border-radius: var(--border-radius);
+    }
+    
+    .log-line {
+        margin-bottom: 0.25rem;
+        line-height: 1.4;
+        font-size: 0.9rem;
+    }
+    
+    .log-error {
+        color: #ff6b6b;
+    }
+    
+    .log-warning {
+        color: #feca57;
+    }
+    
+    .log-info {
+        color: #54a0ff;
+    }
+    
+    .chart-container {
+        height: 200px;
+        margin-bottom: 1rem;
+    }
+    
+    @keyframes pulse {
+        0% { opacity: 1; }
+        50% { opacity: 0.5; }
+        100% { opacity: 1; }
+    }
+    
+    .loading {
+        animation: pulse 1.5s infinite;
+    }
+    
+    .status-indicator {
+        display: inline-block;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        margin-right: 0.5rem;
+    }
+    
+    .status-good {
+        background-color: #2ecc71;
+    }
+    
+    .status-warning {
+        background-color: #f39c12;
+    }
+    
+    .status-critical {
+        background-color: #e74c3c;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="settings-container">
+    <div class="settings-sidebar">
+        <h3 class="settings-nav-title">Settings</h3>
+        <ul class="settings-nav">
+            <li class="settings-nav-item">
+                <a href="{% url 'accounts:settings' %}">
+                    <i class="fas fa-home"></i> Overview
+                </a>
+            </li>
+            <li class="settings-nav-item">
+                <a href="{% url 'accounts:settings_general' %}">
+                    <i class="fas fa-sliders-h"></i> General
+                </a>
+            </li>
+            <li class="settings-nav-item">
+                <a href="{% url 'accounts:settings_appearance' %}">
+                    <i class="fas fa-palette"></i> Appearance
+                </a>
+            </li>
+            <li class="settings-nav-item">
+                <a href="{% url 'accounts:settings_notifications' %}">
+                    <i class="fas fa-bell"></i> Notifications
+                </a>
+            </li>
+            <li class="settings-nav-item">
+                <a href="{% url 'accounts:settings_security' %}">
+                    <i class="fas fa-shield-alt"></i> Security
+                </a>
+            </li>
+            <li class="settings-nav-item active">
+                <a href="{% url 'accounts:settings_system_status' %}">
+                    <i class="fas fa-heartbeat"></i> System Status
+                </a>
+            </li>
+        </ul>
+    </div>
+    
+    <div class="settings-content">
+        <h1 class="settings-title">System Status</h1>
+        
+        <div class="metric-card">
+            <div class="metric-header">
+                <h2 class="metric-title">Live Metrics</h2>
+                <button id="refresh-metrics" class="refresh-button">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                </button>
+            </div>
+            
+            <div class="metrics-grid">
+                <div class="metric-item">
+                    <div class="metric-label">CPU Usage</div>
+                    <div class="gauge-container">
+                        <canvas id="cpu-gauge" class="gauge"></canvas>
+                    </div>
+                    <div class="metric-value" id="cpu-value">0%</div>
+                </div>
+                
+                <div class="metric-item">
+                    <div class="metric-label">Memory Usage</div>
+                    <div class="gauge-container">
+                        <canvas id="memory-gauge" class="gauge"></canvas>
+                    </div>
+                    <div class="metric-value" id="memory-value">0%</div>
+                </div>
+                
+                <div class="metric-item">
+                    <div class="metric-label">Disk Usage</div>
+                    <div class="gauge-container">
+                        <canvas id="disk-gauge" class="gauge"></canvas>
+                    </div>
+                    <div class="metric-value" id="disk-value">0%</div>
+                </div>
+                
+                <div class="metric-item">
+                    <div class="metric-label">App Memory</div>
+                    <div class="chart-container">
+                        <canvas id="app-memory-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="metric-card">
+            <h2 class="metric-title">System Information</h2>
+            
+            <div class="metrics-grid">
+                <div class="metric-item">
+                    <div class="metric-label">Platform</div>
+                    <div class="metric-value system-value">{{ system_info.platform }}</div>
+                </div>
+                
+                <div class="metric-item">
+                    <div class="metric-label">Python Version</div>
+                    <div class="metric-value system-value">{{ system_info.python_version }}</div>
+                </div>
+                
+                <div class="metric-item">
+                    <div class="metric-label">Hostname</div>
+                    <div class="metric-value system-value">{{ system_info.hostname }}</div>
+                </div>
+                
+                <div class="metric-item">
+                    <div class="metric-label">CPU Count</div>
+                    <div class="metric-value system-value">{{ system_info.cpu_count }} cores</div>
+                </div>
+                
+                <div class="metric-item">
+                    <div class="metric-label">Total Memory</div>
+                    <div class="metric-value system-value">{{ system_info.memory_total }} GB</div>
+                </div>
+                
+                <div class="metric-item">
+                    <div class="metric-label">System Status</div>
+                    <div class="metric-value system-value">
+                        <span class="status-indicator status-good" id="system-status-indicator"></span>
+                        <span id="system-status-text">Operational</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="metric-card">
+            <h2 class="metric-title">Database Statistics</h2>
+            
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Model</th>
+                        <th>Record Count</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for model, count in db_stats.items %}
+                    <tr>
+                        <td>{{ model }}</td>
+                        <td>{{ count }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="2">No database statistics available</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="metric-card">
+            <h2 class="metric-title">Error Log</h2>
+            
+            {% if error_log %}
+            <div class="log-container">
+                {% for log_entry in error_log %}
+                <div class="log-line {% if 'ERROR' in log_entry %}log-error{% elif 'WARNING' in log_entry %}log-warning{% else %}log-info{% endif %}">
+                    {{ log_entry }}
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p>No error logs available or log file not found.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
+<script>
+    // Initialize gauges and charts
+    let cpuGauge, memoryGauge, diskGauge, appMemoryChart;
+    let memoryData = Array(20).fill(0);
+    let memoryLabels = Array(20).fill('');
+    
+    function setupCharts() {
+        // CPU gauge
+        cpuGauge = new Chart(document.getElementById('cpu-gauge').getContext('2d'), {
+            type: 'doughnut',
+            data: {
+                datasets: [{
+                    data: [0, 100],
+                    backgroundColor: ['#3498db', '#ecf0f1'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                cutout: '70%',
+                rotation: -90,
+                circumference: 180,
+                maintainAspectRatio: false,
+                plugins: {
+                    tooltip: { enabled: false },
+                    legend: { display: false }
+                }
+            }
+        });
+        
+        // Memory gauge
+        memoryGauge = new Chart(document.getElementById('memory-gauge').getContext('2d'), {
+            type: 'doughnut',
+            data: {
+                datasets: [{
+                    data: [0, 100],
+                    backgroundColor: ['#2ecc71', '#ecf0f1'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                cutout: '70%',
+                rotation: -90,
+                circumference: 180,
+                maintainAspectRatio: false,
+                plugins: {
+                    tooltip: { enabled: false },
+                    legend: { display: false }
+                }
+            }
+        });
+        
+        // Disk gauge
+        diskGauge = new Chart(document.getElementById('disk-gauge').getContext('2d'), {
+            type: 'doughnut',
+            data: {
+                datasets: [{
+                    data: [0, 100],
+                    backgroundColor: ['#9b59b6', '#ecf0f1'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                cutout: '70%',
+                rotation: -90,
+                circumference: 180,
+                maintainAspectRatio: false,
+                plugins: {
+                    tooltip: { enabled: false },
+                    legend: { display: false }
+                }
+            }
+        });
+        
+        // App memory chart
+        appMemoryChart = new Chart(document.getElementById('app-memory-chart').getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: memoryLabels,
+                datasets: [{
+                    label: 'App Memory (MB)',
+                    data: memoryData,
+                    borderColor: '#3498db',
+                    backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                },
+                plugins: {
+                    legend: { display: false }
+                }
+            }
+        });
+    }
+    
+    // Update gauges with new data
+    function updateCharts(data) {
+        // Update CPU gauge
+        cpuGauge.data.datasets[0].data = [data.cpu.usage_percent, 100 - data.cpu.usage_percent];
+        cpuGauge.update();
+        document.getElementById('cpu-value').textContent = `${Math.round(data.cpu.usage_percent)}%`;
+        
+        // Update Memory gauge
+        memoryGauge.data.datasets[0].data = [data.memory.percent, 100 - data.memory.percent];
+        memoryGauge.update();
+        document.getElementById('memory-value').textContent = `${Math.round(data.memory.percent)}%`;
+        
+        // Update Disk gauge
+        diskGauge.data.datasets[0].data = [data.disk.percent, 100 - data.disk.percent];
+        diskGauge.update();
+        document.getElementById('disk-value').textContent = `${Math.round(data.disk.percent)}%`;
+        
+        // Update app memory chart
+        memoryData.shift();
+        memoryData.push(data.process.memory_mb);
+        appMemoryChart.data.datasets[0].data = memoryData;
+        appMemoryChart.update();
+        
+        // Update system status
+        const statusIndicator = document.getElementById('system-status-indicator');
+        const statusText = document.getElementById('system-status-text');
+        
+        if (data.cpu.usage_percent > 90 || data.memory.percent > 90 || data.disk.percent > 90) {
+            statusIndicator.className = 'status-indicator status-critical';
+            statusText.textContent = 'Critical';
+        } else if (data.cpu.usage_percent > 70 || data.memory.percent > 70 || data.disk.percent > 70) {
+            statusIndicator.className = 'status-indicator status-warning';
+            statusText.textContent = 'Warning';
+        } else {
+            statusIndicator.className = 'status-indicator status-good';
+            statusText.textContent = 'Operational';
+        }
+    }
+    
+    // Fetch metrics from API
+    function fetchMetrics() {
+        fetch('{% url "accounts:system_metrics_api" %}')
+            .then(response => response.json())
+            .then(data => {
+                updateCharts(data);
+            })
+            .catch(error => {
+                console.error('Error fetching system metrics:', error);
+            });
+    }
+    
+    // Initialize and set up auto-refresh
+    document.addEventListener('DOMContentLoaded', () => {
+        setupCharts();
+        fetchMetrics();
+        
+        // Refresh metrics every 5 seconds
+        setInterval(fetchMetrics, 5000);
+        
+        // Manual refresh button
+        document.getElementById('refresh-metrics').addEventListener('click', function() {
+            this.classList.add('loading');
+            fetchMetrics();
+            setTimeout(() => this.classList.remove('loading'), 1000);
+        });
+        
+        // Format system info values
+        document.querySelectorAll('.system-value').forEach(el => {
+            if (el.textContent.length > 30) {
+                el.style.fontSize = '0.9rem';
+            }
+        });
+    });
+</script>
+{% endblock %}

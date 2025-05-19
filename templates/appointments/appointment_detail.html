@@ -1,0 +1,405 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Appointment Details - Smart Clinic{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/appointments.css' %}">
+<style>
+    .appointment-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+    
+    .appointment-status {
+        font-size: 0.9rem;
+        padding: 0.4rem 0.8rem;
+        border-radius: 20px;
+        color: #fff;
+        font-weight: 600;
+    }
+    
+    .status-scheduled { background: var(--primary-color); }
+    .status-completed { background: var(--success-color); }
+    .status-cancelled { background: var(--danger-color); }
+    .status-missed { background: var(--warning-color); }
+    
+    .appointment-details-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .detail-card {
+        background: var(--glass-bg);
+        backdrop-filter: blur(12px);
+        border: 1px solid var(--glass-border);
+        border-radius: var(--card-radius);
+        padding: 1.5rem;
+        transition: all 0.3s ease;
+    }
+    
+    .detail-card:hover {
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        transform: translateY(-5px);
+    }
+    
+    .detail-title {
+        font-size: 1.2rem;
+        margin-bottom: 1rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .detail-title i {
+        color: var(--primary-color);
+    }
+    
+    .detail-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 0.75rem;
+    }
+    
+    .detail-label {
+        font-weight: 600;
+        color: var(--text-muted);
+    }
+    
+    .detail-value {
+        color: var(--text-color);
+        text-align: right;
+    }
+    
+    .timeline {
+        position: relative;
+        margin: 2rem 0;
+        padding-left: 2rem;
+    }
+    
+    .timeline::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 3px;
+        background: var(--primary-color);
+        border-radius: 3px;
+    }
+    
+    .timeline-item {
+        position: relative;
+        padding-bottom: 1.5rem;
+    }
+    
+    .timeline-item::before {
+        content: '';
+        position: absolute;
+        left: -2rem;
+        top: 0.25rem;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: var(--primary-color);
+        border: 3px solid var(--card-bg);
+    }
+    
+    .timeline-item:last-child {
+        padding-bottom: 0;
+    }
+    
+    .timeline-title {
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+    }
+    
+    .timeline-date {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        margin-bottom: 0.5rem;
+    }
+    
+    .timeline-content {
+        background: rgba(255, 255, 255, 0.05);
+        padding: 0.75rem;
+        border-radius: 0.5rem;
+    }
+    
+    .appointment-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+        flex-wrap: wrap;
+    }
+    
+    @media (max-width: 768px) {
+        .appointment-details-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .appointment-actions {
+            flex-direction: column;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="back-link">
+        <a href="{% url 'appointments:list' %}">
+            <i class="fas fa-arrow-left"></i> Back to Appointments
+        </a>
+    </div>
+    
+    <div class="appointment-header">
+        <h1 class="slide-up">Appointment Details</h1>
+        <span class="appointment-status status-{{ appointment.status }}">
+            {{ appointment.get_status_display }}
+        </span>
+    </div>
+    
+    <div class="appointment-details-grid">
+        <!-- Main Appointment Details -->
+        <div class="detail-card">
+            <h2 class="detail-title">
+                <i class="fas fa-calendar-check"></i> Appointment Information
+            </h2>
+            
+            <div class="detail-row">
+                <div class="detail-label">Date</div>
+                <div class="detail-value">{{ appointment.date|date:"l, F d, Y" }}</div>
+            </div>
+            
+            <div class="detail-row">
+                <div class="detail-label">Time</div>
+                <div class="detail-value">{{ appointment.start_time|time:"g:i A" }} - {{ appointment.end_time|time:"g:i A" }}</div>
+            </div>
+            
+            <div class="detail-row">
+                <div class="detail-label">Duration</div>
+                <div class="detail-value">{{ appointment.duration }} minutes</div>
+            </div>
+            
+            <div class="detail-row">
+                <div class="detail-label">Appointment Type</div>
+                <div class="detail-value">{{ appointment.appointment_type }}</div>
+            </div>
+            
+            <div class="detail-row">
+                <div class="detail-label">Created</div>
+                <div class="detail-value">{{ appointment.created_at|date:"M d, Y" }}</div>
+            </div>
+        </div>
+        
+        <!-- Patient Information -->
+        <div class="detail-card">
+            <h2 class="detail-title">
+                <i class="fas fa-user-injured"></i> Patient Information
+            </h2>
+            
+            <div class="detail-row">
+                <div class="detail-label">Name</div>
+                <div class="detail-value">{{ appointment.patient }}</div>
+            </div>
+            
+            {% if appointment.patient.phone %}
+            <div class="detail-row">
+                <div class="detail-label">Phone</div>
+                <div class="detail-value">{{ appointment.patient.phone }}</div>
+            </div>
+            {% endif %}
+            
+            {% if appointment.patient.email %}
+            <div class="detail-row">
+                <div class="detail-label">Email</div>
+                <div class="detail-value">{{ appointment.patient.email }}</div>
+            </div>
+            {% endif %}
+            
+            {% if user.is_staff or user.profile.role == 'doctor' %}
+                <div class="mt-3">
+                    <a href="{% url 'patients:detail' appointment.patient.id %}" class="btn btn-sm btn-outline">
+                        <i class="fas fa-folder-open"></i> View Patient Record
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+        
+        <!-- Doctor Information -->
+        <div class="detail-card">
+            <h2 class="detail-title">
+                <i class="fas fa-user-md"></i> Doctor Information
+            </h2>
+            
+            <div class="detail-row">
+                <div class="detail-label">Doctor</div>
+                <div class="detail-value">Dr. {{ appointment.doctor.user.get_full_name }}</div>
+            </div>
+            
+            {% if appointment.doctor.specialization %}
+            <div class="detail-row">
+                <div class="detail-label">Specialization</div>
+                <div class="detail-value">{{ appointment.doctor.specialization }}</div>
+            </div>
+            {% endif %}
+            
+            {% if appointment.doctor.department %}
+            <div class="detail-row">
+                <div class="detail-label">Department</div>
+                <div class="detail-value">{{ appointment.doctor.department.name }}</div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Medical Details Section -->
+    {% if appointment.reason or appointment.notes %}
+    <div class="card glass-card mt-4">
+        <div class="card-header">
+            <h2 class="card-title"><i class="fas fa-notes-medical"></i> Medical Details</h2>
+        </div>
+        <div class="card-body">
+            {% if appointment.reason %}
+            <div class="mb-4">
+                <h3 class="text-base font-semibold mb-2">Reason for Visit</h3>
+                <div class="bg-opacity-5 bg-white p-3 rounded">
+                    {{ appointment.reason }}
+                </div>
+            </div>
+            {% endif %}
+            
+            {% if appointment.notes %}
+            <div>
+                <h3 class="text-base font-semibold mb-2">Doctor's Notes</h3>
+                <div class="bg-opacity-5 bg-white p-3 rounded">
+                    {{ appointment.notes }}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- Appointment Status History -->
+    {% if appointment_history %}
+    <div class="card glass-card mt-4">
+        <div class="card-header">
+            <h2 class="card-title"><i class="fas fa-history"></i> Appointment History</h2>
+        </div>
+        <div class="card-body">
+            <div class="timeline">
+                {% for history in appointment_history %}
+                <div class="timeline-item">
+                    <div class="timeline-title">{{ history.get_status_display }}</div>
+                    <div class="timeline-date">{{ history.updated_at|date:"M d, Y" }} at {{ history.updated_at|time:"g:i A" }}</div>
+                    {% if history.notes %}
+                    <div class="timeline-content">
+                        {{ history.notes }}
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- Actions -->
+    <div class="appointment-actions">
+        {% if appointment.status == 'scheduled' %}
+            {% if user.is_staff or user.profile.role == 'doctor' %}
+                <a href="{% url 'appointments:edit' appointment.id %}" class="btn btn-primary">
+                    <i class="fas fa-edit"></i> Edit Appointment
+                </a>
+                
+                <a href="{% url 'appointments:complete' appointment.id %}" class="btn btn-success">
+                    <i class="fas fa-check-circle"></i> Mark as Completed
+                </a>
+            {% endif %}
+            
+            <a href="{% url 'appointments:cancel' appointment.id %}" class="btn btn-danger">
+                <i class="fas fa-times-circle"></i> Cancel Appointment
+            </a>
+            
+            {% if user.is_staff %}
+                <a href="{% url 'appointments:reschedule' appointment.id %}" class="btn btn-warning">
+                    <i class="fas fa-calendar-alt"></i> Reschedule
+                </a>
+            {% endif %}
+        {% elif appointment.status == 'completed' and user.profile.role == 'doctor' %}
+            <a href="{% url 'patients:create_medical_record' appointment.patient.id %}" class="btn btn-primary">
+                <i class="fas fa-notes-medical"></i> Add Medical Record
+            </a>
+            
+            <a href="{% url 'patients:create_prescription' appointment.patient.id %}" class="btn btn-info">
+                <i class="fas fa-prescription"></i> Issue Prescription
+            </a>
+        {% endif %}
+        
+        {% if user.is_staff %}
+            <button type="button" class="btn btn-outline" onclick="printAppointment()">
+                <i class="fas fa-print"></i> Print Details
+            </button>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Apply animation to cards
+    document.querySelectorAll('.detail-card').forEach((card, index) => {
+        card.style.opacity = 0;
+        card.style.transform = 'translateY(20px)';
+        card.style.animation = `fadeInUp 0.5s ease-out ${0.1 + (index * 0.1)}s forwards`;
+    });
+    
+    // Function to print appointment details
+    function printAppointment() {
+        const printContent = document.querySelector('.container').innerHTML;
+        const originalContent = document.body.innerHTML;
+        
+        document.body.innerHTML = `
+            <div style="padding: 20px;">
+                <h1 style="text-align: center;">Smart Clinic - Appointment Details</h1>
+                ${printContent}
+            </div>
+        `;
+        
+        window.print();
+        document.body.innerHTML = originalContent;
+        
+        // Reapply animations after printing
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.detail-card').forEach((card, index) => {
+                card.style.opacity = 0;
+                card.style.transform = 'translateY(20px)';
+                card.style.animation = `fadeInUp 0.5s ease-out ${0.1 + (index * 0.1)}s forwards`;
+            });
+        });
+    }
+    
+    // Add water ripple effect on detail cards
+    document.querySelectorAll('.detail-card').forEach(card => {
+        card.addEventListener('mouseenter', function(e) {
+            const ripple = document.createElement('div');
+            ripple.className = 'water-ripple-effect';
+            ripple.style.left = '50%';
+            ripple.style.top = '50%';
+            this.appendChild(ripple);
+            
+            setTimeout(() => {
+                ripple.remove();
+            }, 1000);
+        });
+    });
+</script>
+{% endblock %}

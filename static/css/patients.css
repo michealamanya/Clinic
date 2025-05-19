@@ -1,0 +1,685 @@
+/* Patient-specific styles */
+
+.patient-header {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.patient-avatar {
+    width: 100px;
+    height: 100px;
+    background-color: var(--primary-color);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 2.5rem;
+    font-weight: 600;
+}
+
+.patient-info {
+    flex: 1;
+}
+
+.patient-name {
+    font-size: 1.8rem;
+    margin-bottom: 0.25rem;
+}
+
+.patient-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.patient-detail {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--light-text);
+}
+
+.patient-detail i {
+    color: var(--primary-color);
+}
+
+.patient-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+/* Tabs */
+.tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 1.5rem;
+    overflow-x: auto;
+}
+
+.tab {
+    padding: 0.75rem 1.25rem;
+    font-weight: 500;
+    color: var(--light-text);
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    transition: all var(--transition-speed) ease;
+    white-space: nowrap;
+}
+
+.tab:hover {
+    color: var(--primary-color);
+}
+
+.tab.active {
+    color: var(--primary-color);
+    border-bottom-color: var(--primary-color);
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+    animation: fadeIn 0.5s ease;
+}
+
+/* Medical Records */
+.medical-record {
+    margin-bottom: 1.5rem;
+    border-radius: var(--border-radius);
+    background-color: var(--card-bg);
+    box-shadow: var(--card-shadow);
+    overflow: hidden;
+    transition: all var(--transition-speed) ease;
+}
+
+.medical-record:hover {
+    box-shadow: var(--hover-shadow);
+    transform: translateY(-2px);
+}
+
+.medical-record-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background-color: rgba(52, 152, 219, 0.05);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.medical-record-date {
+    font-weight: 500;
+    color: var(--primary-color);
+}
+
+.medical-record-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.medical-record-body {
+    padding: 1rem;
+}
+
+.medical-record-section {
+    margin-bottom: 1rem;
+}
+
+.medical-record-section:last-child {
+    margin-bottom: 0;
+}
+
+.medical-record-label {
+    font-weight: 500;
+    margin-bottom: 0.25rem;
+    color: var(--light-text);
+    font-size: 0.9rem;
+}
+
+.medical-record-value {
+    line-height: 1.5;
+}
+
+.medical-record-footer {
+    background-color: rgba(52, 152, 219, 0.02);
+    padding: 0.75rem 1rem;
+    border-top: 1px solid var(--border-color);
+    font-size: 0.9rem;
+}
+
+.follow-up-tag {
+    display: inline-block;
+    background-color: rgba(46, 204, 113, 0.1);
+    color: var(--secondary-color);
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+/* Prescriptions */
+.prescription {
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
+    box-shadow: var(--card-shadow);
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-left: 3px solid var(--accent-color);
+    transition: all var(--transition-speed) ease;
+}
+
+.prescription:hover {
+    box-shadow: var(--hover-shadow);
+    transform: translateX(3px);
+}
+
+.prescription-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+}
+
+.prescription-name {
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.prescription-dates {
+    font-size: 0.85rem;
+    color: var(--light-text);
+}
+
+.prescription-details {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.prescription-detail {
+    display: flex;
+    flex-direction: column;
+}
+
+.prescription-label {
+    font-size: 0.8rem;
+    color: var(--light-text);
+    margin-bottom: 0.25rem;
+}
+
+.prescription-value {
+    font-weight: 500;
+}
+
+.prescription-instructions {
+    margin-top: 0.5rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--border-color);
+}
+
+/* Appointments */
+.timeline {
+    position: relative;
+    margin-left: 20px;
+    padding-left: 20px;
+}
+
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(to bottom, var(--primary-light), var(--primary-dark));
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.5rem;
+}
+
+.timeline-item:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.timeline-point {
+    position: absolute;
+    left: -29px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background-color: var(--primary-color);
+    border: 3px solid white;
+    box-shadow: 0 0 0 1px var(--primary-color);
+}
+
+.timeline-content {
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
+    box-shadow: var(--card-shadow);
+    padding: 1rem;
+    transition: all var(--transition-speed) ease;
+}
+
+.timeline-content:hover {
+    box-shadow: var(--hover-shadow);
+    transform: translateY(-2px);
+}
+
+.timeline-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+}
+
+.timeline-title {
+    font-weight: 500;
+}
+
+.timeline-date {
+    font-size: 0.85rem;
+    color: var(--light-text);
+}
+
+/* Stats and metrics */
+.patient-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.stat-box {
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
+    box-shadow: var(--card-shadow);
+    padding: 1rem;
+    text-align: center;
+    transition: all var(--transition-speed) ease;
+}
+
+.stat-box:hover {
+    box-shadow: var(--hover-shadow);
+    transform: translateY(-3px);
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: 600;
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+}
+
+.stat-label {
+    color: var(--light-text);
+    font-size: 0.9rem;
+}
+
+/* Patient list specific styles */
+.patients-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.header-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.filters-container {
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
+    box-shadow: var(--card-shadow);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.filters-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.search-group {
+    flex: 1;
+}
+
+.search-input-group {
+    position: relative;
+}
+
+.search-btn {
+    position: absolute;
+    right: 1px;
+    top: 1px;
+    bottom: 1px;
+    background: transparent;
+    border: none;
+    padding: 0 0.75rem;
+    color: var(--primary-color);
+    cursor: pointer;
+}
+
+.filters-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: flex-end;
+}
+
+.filters-group .form-group {
+    flex: 1;
+    min-width: 200px;
+}
+
+.filter-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.patient-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+    .filters-form {
+        flex-direction: row;
+    }
+    
+    .patient-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 1200px) {
+    .patient-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+.patient-card {
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
+    box-shadow: var(--card-shadow);
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    transition: all var(--transition-speed) ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.patient-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(to bottom, var(--primary-light), var(--primary-dark));
+    opacity: 0.7;
+}
+
+.patient-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--hover-shadow);
+}
+
+.patient-avatar {
+    width: 60px;
+    height: 60px;
+    background-color: var(--primary-color);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.patient-details {
+    flex: 1;
+}
+
+.patient-name {
+    font-size: 1.25rem;
+    margin-bottom: 0.5rem;
+}
+
+.patient-name a {
+    color: var(--text-color);
+    transition: color var(--transition-speed) ease;
+}
+
+.patient-name a:hover {
+    color: var(--primary-color);
+}
+
+.patient-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.info-item {
+    display: flex;
+    align-items: center;
+    font-size: 0.9rem;
+    color: var(--light-text);
+}
+
+.info-item i {
+    width: 20px;
+    margin-right: 0.5rem;
+    color: var(--primary-color);
+}
+
+.patient-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.pagination-container {
+    grid-column: 1 / -1;
+    margin-top: 1rem;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    padding: 1rem;
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
+    box-shadow: var(--card-shadow);
+}
+
+.pagination a {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    margin: 0 0.25rem;
+    border-radius: 4px;
+    color: var(--primary-color);
+    transition: all var(--transition-speed) ease;
+}
+
+.pagination a:hover {
+    background-color: rgba(52, 152, 219, 0.1);
+}
+
+.pagination .current {
+    padding: 0.25rem 0.5rem;
+    margin: 0 0.25rem;
+    font-weight: 600;
+}
+
+/* Water ripple effect */
+.ripple-hover {
+    position: relative;
+    overflow: hidden;
+}
+
+.ripple-hover::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 5px;
+    height: 5px;
+    background: rgba(52, 152, 219, 0.2);
+    opacity: 0;
+    border-radius: 100%;
+    transform: translate(-50%, -50%) scale(1);
+    z-index: 1;
+}
+
+.ripple-hover:hover::after {
+    animation: ripple-out 2s cubic-bezier(0, 0, 0.2, 1);
+    opacity: 1;
+}
+
+@keyframes ripple-out {
+    0% {
+        transform: translate(-50%, -50%) scale(0.3);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(2);
+        opacity: 0;
+    }
+}
+
+/* Empty state */
+.empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    grid-column: 1 / -1;
+}
+
+.empty-state i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    color: rgba(52, 152, 219, 0.2);
+}
+
+.empty-state-title {
+    font-size: 1.25rem;
+    margin-bottom: 0.5rem;
+}
+
+.empty-state-description {
+    max-width: 500px;
+    margin: 0 auto 1.5rem;
+    color: var(--light-text);
+}
+
+.empty-state-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+
+/* Patient form specific styles */
+
+.patient-form {
+    padding: 1.5rem;
+}
+
+.form-section-title {
+    font-size: 1.25rem;
+    color: var(--primary-color);
+    margin: 2rem 0 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border-color);
+    position: relative;
+}
+
+.form-section-title::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    width: 80px;
+    height: 2px;
+    background: linear-gradient(to right, var(--primary-color), var(--primary-light));
+}
+
+.form-section-title:first-of-type {
+    margin-top: 0;
+}
+
+.form-group {
+    margin-bottom: 1.25rem;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+/* Apply water styling to form inputs */
+.patient-form input[type="text"],
+.patient-form input[type="email"],
+.patient-form input[type="tel"],
+.patient-form input[type="date"],
+.patient-form select,
+.patient-form textarea {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    background-color: var(--bg-color);
+    transition: all var(--transition-speed) ease;
+}
+
+.patient-form input[type="text"]:focus,
+.patient-form input[type="email"]:focus,
+.patient-form input[type="tel"]:focus,
+.patient-form input[type="date"]:focus,
+.patient-form select:focus,
+.patient-form textarea:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+    outline: none;
+}
+
+/* Subtle wave animation for form sections */
+.form-section-title {
+    position: relative;
+    overflow: hidden;
+}
+
+.form-section-title::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: -100%;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(52, 152, 219, 0.2), transparent);
+    animation: wave-animation 2s infinite linear;
+}
+
+@keyframes wave-animation {
+    from { left: -100%; }
+    to { left: 100%; }
+}

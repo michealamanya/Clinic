@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Departments - Smart Clinic{% endblock %}
+
+{% block content %}
+<div class="card slide-up">
+    <div class="card-header">
+        <h1 class="card-title">Departments</h1>
+        <a href="{% url 'accounts:department_create' %}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> New Department
+        </a>
+    </div>
+    
+    {% if departments %}
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Phone Extension</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for department in departments %}
+                    <tr>
+                        <td>
+                            <a href="{% url 'accounts:department_detail' department.pk %}">{{ department.name }}</a>
+                        </td>
+                        <td>{{ department.phone_extension|default:"-" }}</td>
+                        <td>
+                            {% if department.is_active %}
+                                <span class="badge bg-success">Active</span>
+                            {% else %}
+                                <span class="badge bg-danger">Inactive</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="btn-group">
+                                <a href="{% url 'accounts:department_edit' department.pk %}" class="btn btn-sm btn-outline">
+                                    <i class="fas fa-edit"></i> Edit
+                                </a>
+                                <a href="{% url 'accounts:department_delete' department.pk %}" class="btn btn-sm btn-danger">
+                                    <i class="fas fa-trash"></i> Delete
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <i class="fas fa-building"></i>
+            <h3 class="empty-state-title">No Departments</h3>
+            <p class="empty-state-description">There are no departments set up yet.</p>
+            <a href="{% url 'accounts:department_create' %}" class="btn btn-primary">
+                Create Department
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Delete Appointment - Smart Clinic{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="form-container">
+        <h1 class="form-title">Delete Appointment</h1>
+        
+        <div class="alert alert-danger">
+            <p><i class="fas fa-exclamation-triangle"></i> Are you sure you want to <strong>permanently delete</strong> this appointment?</p>
+            <p>This action <strong>cannot be undone</strong>. Consider cancelling the appointment instead.</p>
+            
+            <div class="appointment-summary">
+                <p><strong>Date:</strong> {{ appointment.date|date:"l, F d, Y" }}</p>
+                <p><strong>Time:</strong> {{ appointment.start_time|time:"g:i A" }} - {{ appointment.end_time|time:"g:i A" }}</p>
+                <p><strong>Doctor:</strong> Dr. {{ appointment.doctor.user.get_full_name }}</p>
+                <p><strong>Patient:</strong> {{ appointment.patient }}</p>
+            </div>
+        </div>
+        
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="form-actions">
+                <button type="submit" class="btn btn-danger">
+                    <i class="fas fa-trash"></i> Permanently Delete
+                </button>
+                <a href="{% url 'appointments:detail' appointment.id %}" class="btn btn-outline">
+                    <i class="fas fa-arrow-left"></i> Go Back
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

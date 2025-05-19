@@ -1,0 +1,157 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Register - Smart Clinic{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/auth.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-background"></div>
+    
+    <div class="auth-content">
+        <div class="auth-card">
+            <div class="auth-header">
+                <h1 class="auth-title">Create Account</h1>
+                <p class="auth-subtitle">Join Smart Clinic and get started today</p>
+            </div>
+            
+            {% if form.errors %}
+            <div class="alert alert-danger">
+                Please correct the errors below.
+            </div>
+            {% endif %}
+            
+            <form method="post" class="auth-form floating-labels">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <input type="text" name="username" id="id_username" class="form-control" placeholder=" " autocomplete="username" required {% if form.username.value %}value="{{ form.username.value }}"{% endif %}>
+                    <label for="id_username" class="form-label">Username</label>
+                    {% if form.username.errors %}
+                    <ul class="errorlist">
+                        {% for error in form.username.errors %}
+                        <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    <input type="email" name="email" id="id_email" class="form-control" placeholder=" " autocomplete="email" required {% if form.email.value %}value="{{ form.email.value }}"{% endif %}>
+                    <label for="id_email" class="form-label">Email</label>
+                    {% if form.email.errors %}
+                    <ul class="errorlist">
+                        {% for error in form.email.errors %}
+                        <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <input type="text" name="first_name" id="id_first_name" class="form-control" placeholder=" " autocomplete="given-name" required {% if form.first_name.value %}value="{{ form.first_name.value }}"{% endif %}>
+                            <label for="id_first_name" class="form-label">First Name</label>
+                            {% if form.first_name.errors %}
+                            <ul class="errorlist">
+                                {% for error in form.first_name.errors %}
+                                <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <input type="text" name="last_name" id="id_last_name" class="form-control" placeholder=" " autocomplete="family-name" required {% if form.last_name.value %}value="{{ form.last_name.value }}"{% endif %}>
+                            <label for="id_last_name" class="form-label">Last Name</label>
+                            {% if form.last_name.errors %}
+                            <ul class="errorlist">
+                                {% for error in form.last_name.errors %}
+                                <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <input type="password" name="password1" id="id_password1" class="form-control" placeholder=" " autocomplete="new-password" required>
+                    <label for="id_password1" class="form-label">Password</label>
+                    {% if form.password1.errors %}
+                    <ul class="errorlist">
+                        {% for error in form.password1.errors %}
+                        <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    <input type="password" name="password2" id="id_password2" class="form-control" placeholder=" " autocomplete="new-password" required>
+                    <label for="id_password2" class="form-label">Confirm Password</label>
+                    {% if form.password2.errors %}
+                    <ul class="errorlist">
+                        {% for error in form.password2.errors %}
+                        <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                </div>
+                
+                <p class="text-muted" style="font-size: 0.85rem;">
+                    <i class="fas fa-info-circle"></i> Password must be at least 8 characters and contain letters and numbers. It cannot be similar to your personal information.
+                </p>
+                
+                <button type="submit" class="btn btn-primary water-ripple">Create Account</button>
+                
+                <div class="auth-divider">
+                    <span>OR</span>
+                </div>
+                
+                <div class="auth-links">
+                    Already have an account? <a href="{% url 'login' %}">Sign in</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Add ripple effect to button
+    document.querySelectorAll('.water-ripple').forEach(button => {
+        button.addEventListener('click', function(e) {
+            const rect = button.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            const ripple = document.createElement('span');
+            ripple.style.cssText = `
+                position: absolute;
+                background: rgba(255, 255, 255, 0.7);
+                border-radius: 50%;
+                pointer-events: none;
+                width: 10px;
+                height: 10px;
+                top: ${y}px;
+                left: ${x}px;
+                transform: translate(-50%, -50%) scale(0);
+                animation: ripple 0.6s linear;
+            `;
+            
+            button.appendChild(ripple);
+            
+            setTimeout(() => {
+                ripple.remove();
+            }, 600);
+        });
+    });
+</script>
+{% endblock %}

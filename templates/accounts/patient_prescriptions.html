@@ -1,0 +1,243 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Prescriptions - Smart Clinic{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/patient-portal.css' %}">
+<style>
+    .prescriptions-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+    
+    .page-header {
+        margin-bottom: 2rem;
+    }
+    
+    .page-title {
+        font-size: 2rem;
+        font-weight: 600;
+        color: var(--primary-color);
+        margin-bottom: 0.5rem;
+    }
+    
+    .prescription-list {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
+    @media (min-width: 768px) {
+        .prescription-list {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+    
+    @media (min-width: 1200px) {
+        .prescription-list {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+    
+    .prescription-card {
+        background: var(--card-bg);
+        border-radius: var(--card-radius);
+        box-shadow: var(--card-shadow);
+        overflow: hidden;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        position: relative;
+    }
+    
+    .prescription-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--card-shadow-hover);
+    }
+    
+    .prescription-status {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+    
+    .status-active {
+        background-color: rgba(46, 204, 113, 0.2);
+        color: #27ae60;
+    }
+    
+    .status-expired {
+        background-color: rgba(231, 76, 60, 0.2);
+        color: #c0392b;
+    }
+    
+    .status-pending {
+        background-color: rgba(241, 196, 15, 0.2);
+        color: #f39c12;
+    }
+    
+    .prescription-header {
+        padding: 1.5rem;
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    .prescription-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+    
+    .prescription-dates {
+        display: flex;
+        font-size: 0.85rem;
+        color: var(--text-muted);
+    }
+    
+    .prescription-date-item {
+        margin-right: 1rem;
+    }
+    
+    .prescription-content {
+        padding: 1.5rem;
+    }
+    
+    .medication-item {
+        margin-bottom: 1rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px dashed var(--border-color);
+    }
+    
+    .medication-item:last-child {
+        margin-bottom: 0;
+        padding-bottom: 0;
+        border-bottom: none;
+    }
+    
+    .medication-name {
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+    }
+    
+    .medication-dosage {
+        font-size: 0.9rem;
+        margin-bottom: 0.25rem;
+    }
+    
+    .medication-instructions {
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+    }
+    
+    .empty-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 3rem;
+        text-align: center;
+        background: var(--card-bg);
+        border-radius: var(--card-radius);
+        box-shadow: var(--card-shadow);
+    }
+    
+    .empty-state i {
+        font-size: 3rem;
+        color: var(--primary-color);
+        opacity: 0.5;
+        margin-bottom: 1rem;
+    }
+    
+    .empty-state-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+    
+    .empty-state-description {
+        color: var(--text-muted);
+        margin-bottom: 1.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="prescriptions-container">
+    <div class="page-header slide-up">
+        <h1 class="page-title">My Prescriptions</h1>
+        <p class="page-description">Track your current and past prescriptions</p>
+    </div>
+    
+    {% if prescriptions %}
+    <div class="prescription-list">
+        {% for prescription in prescriptions %}
+        <div class="prescription-card slide-up" style="animation-delay: {{ forloop.counter|divisibleby:3 }}00ms">
+            <div class="prescription-status 
+                {% if prescription.is_active %}status-active
+                {% elif prescription.end_date < today %}status-expired
+                {% else %}status-pending{% endif %}">
+                {% if prescription.is_active %}Active
+                {% elif prescription.end_date < today %}Expired
+                {% else %}Pending{% endif %}
+            </div>
+            
+            <div class="prescription-header">
+                <h3 class="prescription-title">
+                    Prescription #{{ prescription.id }}
+                </h3>
+                
+                <div class="prescription-meta">
+                    <div class="prescription-doctor">
+                        Prescribed by: Dr. {{ prescription.doctor.user.get_full_name }}
+                    </div>
+                </div>
+                
+                <div class="prescription-dates">
+                    <div class="prescription-date-item">
+                        <i class="far fa-calendar-plus"></i> {{ prescription.start_date|date:"M d, Y" }}
+                    </div>
+                    <div class="prescription-date-item">
+                        <i class="far fa-calendar-minus"></i> {{ prescription.end_date|date:"M d, Y" }}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="prescription-content">
+                {% for medication in prescription.medications.all %}
+                <div class="medication-item">
+                    <div class="medication-name">{{ medication.name }}</div>
+                    <div class="medication-dosage">{{ medication.dosage }}</div>
+                    <div class="medication-instructions">{{ medication.instructions }}</div>
+                </div>
+                {% empty %}
+                <div class="medication-item">
+                    <div class="medication-name">{{ prescription.medication_name }}</div>
+                    <div class="medication-dosage">{{ prescription.dosage }}</div>
+                    <div class="medication-instructions">{{ prescription.instructions }}</div>
+                </div>
+                {% endfor %}
+                
+                {% if prescription.notes %}
+                <div class="prescription-notes">
+                    <strong>Notes:</strong> {{ prescription.notes }}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state slide-up">
+        <i class="fas fa-prescription-bottle-alt"></i>
+        <h3 class="empty-state-title">No Prescriptions Found</h3>
+        <p class="empty-state-description">You don't have any prescriptions at the moment. Your doctor will add them during or after your appointment.</p>
+        <a href="{% url 'appointments:create' %}" class="btn btn-primary">
+            <i class="fas fa-calendar-plus"></i> Schedule an Appointment
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+    {% if department %}Edit Department{% else %}Create Department{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="card slide-up">
+    <div class="card-header">
+        <h1 class="card-title">
+            {% if department %}
+                Edit Department
+            {% else %}
+                Create Department
+            {% endif %}
+        </h1>
+    </div>
+    
+    <form method="post" class="slide-up" style="animation-delay: 0.1s;">
+        {% csrf_token %}
+        
+        {% if form.errors %}
+        <div class="alert alert-danger">
+            Please correct the errors below.
+        </div>
+        {% endif %}
+        
+        <div class="form-group">
+            <label for="{{ form.name.id_for_label }}" class="form-label">Name</label>
+            {{ form.name }}
+            {% if form.name.errors %}
+            <ul class="errorlist">
+                {% for error in form.name.errors %}
+                <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+        </div>
+        
+        <div class="form-group">
+            <label for="{{ form.description.id_for_label }}" class="form-label">Description</label>
+            {{ form.description }}
+            {% if form.description.errors %}
+            <ul class="errorlist">
+                {% for error in form.description.errors %}
+                <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+        </div>
+        
+        <div class="form-group">
+            <label for="{{ form.phone_extension.id_for_label }}" class="form-label">Phone Extension</label>
+            {{ form.phone_extension }}
+            {% if form.phone_extension.errors %}
+            <ul class="errorlist">
+                {% for error in form.phone_extension.errors %}
+                <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+        </div>
+        
+        <div class="form-group">
+            <div class="form-check">
+                {{ form.is_active }}
+                <label for="{{ form.is_active.id_for_label }}" class="form-check-label">Active</label>
+            </div>
+            {% if form.is_active.errors %}
+            <ul class="errorlist">
+                {% for error in form.is_active.errors %}
+                <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+        </div>
+        
+        <div class="form-group mt-3">
+            <button type="submit" class="btn btn-primary water-ripple">
+                {% if department %}
+                    Save Changes
+                {% else %}
+                    Create Department
+                {% endif %}
+            </button>
+            <a href="{% url 'accounts:department_list' %}" class="btn btn-outline">
+                Cancel
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Add ripple effect to button
+    document.querySelectorAll('.water-ripple').forEach(button => {
+        button.addEventListener('click', function(e) {
+            const rect = button.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            const ripple = document.createElement('span');
+            ripple.style.cssText = `
+                position: absolute;
+                background: rgba(255, 255, 255, 0.7);
+                border-radius: 50%;
+                pointer-events: none;
+                width: 10px;
+                height: 10px;
+                top: ${y}px;
+                left: ${x}px;
+                transform: translate(-50%, -50%) scale(0);
+                animation: ripple 0.6s linear;
+            `;
+            
+            button.appendChild(ripple);
+            
+            setTimeout(() => {
+                ripple.remove();
+            }, 600);
+        });
+    });
+</script>
+{% endblock %}

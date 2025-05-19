@@ -1,0 +1,348 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dashboard - Smart Clinic{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+{% endblock %}
+
+{% block content %}
+<h1 class="slide-up">Dashboard</h1>
+<p class="slide-up" style="animation-delay: 0.1s;">Welcome back, {{ user.get_full_name|default:user.username }}!</p>
+
+<section class="stats-container slide-up" style="animation-delay: 0.2s;">
+    <div class="stat-card ripple">
+        <div class="stat-icon">
+            <i class="fas fa-user-injured"></i>
+        </div>
+        <div class="stat-info">
+            <div class="stat-title">Total Patients</div>
+            <div class="stat-value">{{ total_patients }}</div>
+        </div>
+    </div>
+    
+    <div class="stat-card ripple">
+        <div class="stat-icon">
+            <i class="fas fa-calendar-check"></i>
+        </div>
+        <div class="stat-info">
+            <div class="stat-title">Total Appointments</div>
+            <div class="stat-value">{{ total_appointments }}</div>
+        </div>
+    </div>
+    
+    <div class="stat-card ripple">
+        <div class="stat-icon">
+            <i class="fas fa-calendar-day"></i>
+        </div>
+        <div class="stat-info">
+            <div class="stat-title">Today's Appointments</div>
+            <div class="stat-value">{{ todays_appointments.count }}</div>
+        </div>
+    </div>
+    
+    <div class="stat-card ripple">
+        <div class="stat-icon">
+            <i class="fas fa-building"></i>
+        </div>
+        <div class="stat-info">
+            <div class="stat-title">Departments</div>
+            <div class="stat-value">{{ departments.count|default:"0" }}</div>
+        </div>
+    </div>
+    
+    {% if user.is_staff %}
+    <div class="stat-card ripple">
+        <div class="stat-icon">
+            <i class="fas fa-cogs"></i>
+        </div>
+        <div class="stat-info">
+            <div class="stat-title">System Settings</div>
+            <div class="stat-value">
+                <a href="{% url 'accounts:settings' %}" class="settings-link">Manage</a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</section>
+
+<!-- Department Overview Section -->
+<div class="row slide-up" style="animation-delay: 0.25s;">
+    <div class="col-md-12">
+        <div class="card glass-card">
+            <div class="card-header">
+                <h2 class="card-title">Departments Overview</h2>
+                {% if user.is_staff %}
+                <div class="header-actions">
+                    <a href="{% url 'accounts:department_create' %}" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> New Department
+                    </a>
+                    <a href="{% url 'accounts:doctor_create' %}" class="btn btn-success">
+                        <i class="fas fa-user-md"></i> Add Doctor
+                    </a>
+                    <a href="/admin/" class="btn btn-outline">
+                        <i class="fas fa-cogs"></i> Settings
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+            
+            {% if departments %}
+            <div class="departments-grid">
+                {% for department in departments %}
+                <div class="department-card {% if department.is_new %}new-item{% endif %}">
+                    <div class="department-header">
+                        <h3 class="department-name">{{ department.name }}</h3>
+                        {% if department.is_new %}<span class="badge new-badge">New</span>{% endif %}
+                    </div>
+                    <div class="department-stats">
+                        <div class="dept-stat">
+                            <i class="fas fa-user-md"></i>
+                            <span>{{ department.staff_count }} Staff</span>
+                        </div>
+                        <div class="dept-stat">
+                            <i class="fas fa-calendar-check"></i>
+                            <span>{{ department.appointment_count }} Appointments</span>
+                        </div>
+                    </div>
+                    <div class="department-actions">
+                        <a href="{% url 'accounts:department_detail' department.pk %}" class="btn btn-sm btn-outline">View Details</a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <p>No departments have been created yet.</p>
+                {% if user.is_staff %}
+                <a href="{% url 'accounts:department_create' %}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Create Department
+                </a>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="row slide-up" style="animation-delay: 0.3s;">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Today's Appointments</h2>
+                <a href="{% url 'appointments:create' %}" class="btn btn-primary">New Appointment</a>
+            </div>
+            
+            {% if todays_appointments %}
+                <div class="activity-list">
+                    {% for appointment in todays_appointments %}
+                        <div class="appointment-card {% if appointment.is_new %}new-item{% endif %}">
+                            <div class="appointment-header">
+                                <span class="appointment-time">
+                                    <i class="far fa-clock"></i> {{ appointment.start_time|time:"g:i A" }} - {{ appointment.end_time|time:"g:i A" }}
+                                </span>
+                                <span class="appointment-status status-{{ appointment.status }}">
+                                    {{ appointment.get_status_display }}
+                                </span>
+                            </div>
+                            <div class="appointment-patient">
+                                <i class="fas fa-user-injured"></i> {{ appointment.patient }}
+                            </div>
+                            <div class="appointment-doctor">
+                                <i class="fas fa-user-md"></i> Dr. {{ appointment.doctor.user.get_full_name }}
+                            </div>
+                            {% if appointment.department %}
+                            <div class="appointment-department">
+                                <i class="fas fa-building"></i> {{ appointment.doctor.department.name }}
+                            </div>
+                            {% endif %}
+                            <div class="mt-2">
+                                <a href="{% url 'appointments:detail' appointment.pk %}" class="btn btn-outline">View Details</a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-center mt-3 mb-3">No appointments scheduled for today.</p>
+            {% endif %}
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Recent Activity</h2>
+            </div>
+            
+            {% if recent_activities %}
+            <ul class="activity-list">
+                {% for activity in recent_activities %}
+                <li class="activity-item {% if activity.is_new %}new-item{% endif %}">
+                    <div class="activity-icon">
+                        <i class="{{ activity.icon }}"></i>
+                    </div>
+                    <div class="activity-content">
+                        <div class="activity-title">{{ activity.description }}</div>
+                        <div class="activity-meta">{{ activity.timestamp|timesince }} ago</div>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p class="text-center mt-3 mb-3">No recent activity to display.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% if user.is_staff and doctors_with_counts %}
+<div class="card slide-up" style="animation-delay: 0.4s;">
+    <div class="card-header">
+        <h2 class="card-title">Doctor Statistics</h2>
+    </div>
+    
+    <div class="row">
+        {% for doctor in doctors_with_counts %}
+            <div class="col-md-4">
+                <div class="doctor-stat-card {% if doctor.is_new %}new-item{% endif %}">
+                    <div class="doctor-profile">
+                        <div class="doctor-avatar">
+                            {% if doctor.profile_picture %}
+                                <img src="{{ doctor.profile_picture.url }}" alt="{{ doctor.user.get_full_name }}">
+                            {% else %}
+                                <div class="avatar-placeholder">
+                                    {{ doctor.user.first_name|first }}{{ doctor.user.last_name|first }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="doctor-info">
+                            <h3 class="doctor-name">Dr. {{ doctor.user.get_full_name }}</h3>
+                            <p class="doctor-specialty">{{ doctor.specialization }}</p>
+                            {% if doctor.department %}
+                            <p class="doctor-department">{{ doctor.department.name }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="doctor-stats">
+                        <div class="doctor-stat">
+                            <span class="stat-label">Appointments</span>
+                            <span class="stat-number">{{ doctor.appointment_count }}</span>
+                        </div>
+                        <div class="doctor-stat">
+                            <span class="stat-label">Patients</span>
+                            <span class="stat-number">{{ doctor.patient_count }}</span>
+                        </div>
+                        <div class="doctor-stat">
+                            <span class="stat-label">Today</span>
+                            <span class="stat-number">{{ doctor.today_count }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Apply staggered animation to stat cards
+    const statCards = document.querySelectorAll('.stat-card');
+    statCards.forEach((card, index) => {
+        card.style.animationDelay = `${0.1 + (index * 0.1)}s`;
+    });
+    
+    // Apply staggered animation to appointment cards
+    const appointmentCards = document.querySelectorAll('.appointment-card');
+    appointmentCards.forEach((card, index) => {
+        card.style.animationDelay = `${0.2 + (index * 0.1)}s`;
+    });
+
+    // Highlight new items
+    document.querySelectorAll('.new-item').forEach(item => {
+        // Add pulsing animation effect
+        item.classList.add('pulse-animation');
+        
+        // Remove the highlighting after 10 seconds
+        setTimeout(() => {
+            item.classList.remove('pulse-animation');
+        }, 10000);
+    });
+    
+    // Enhanced water ripple effect for department cards
+    document.querySelectorAll('.department-card').forEach(card => {
+        card.addEventListener('mouseenter', function(e) {
+            // Create water ripple effect on hover
+            const ripple = document.createElement('div');
+            ripple.className = 'water-ripple-effect';
+            
+            // Position the ripple at center of card
+            ripple.style.left = '50%';
+            ripple.style.top = '50%';
+            
+            this.appendChild(ripple);
+            
+            setTimeout(() => {
+                ripple.remove();
+            }, 1000);
+        });
+        
+        // Add additional mouse move highlight effect
+        card.addEventListener('mousemove', function(e) {
+            const rect = this.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            // Calculate percentage position
+            const percentX = Math.round((x / rect.width) * 100);
+            const percentY = Math.round((y / rect.height) * 100);
+            
+            // Add subtle lighting effect based on mouse position
+            this.style.background = `
+                linear-gradient(
+                    135deg, 
+                    var(--glass-bg) 0%, 
+                    rgba(255, 255, 255, 0.25) ${percentX}%, 
+                    var(--glass-bg) 100%
+                )
+            `;
+        });
+        
+        // Reset on mouse leave
+        card.addEventListener('mouseleave', function() {
+            this.style.background = 'var(--glass-bg)';
+        });
+    });
+    
+    // Apply glass effect to all cards
+    document.querySelectorAll('.card').forEach(card => {
+        if (!card.classList.contains('glass-card')) {
+            card.classList.add('glass-card');
+        }
+    });
+    
+    // Add entrance animations to sections
+    const animateSections = () => {
+        const sections = document.querySelectorAll('.row, .stat-card, .card');
+        sections.forEach((section, index) => {
+            if (!section.classList.contains('animated')) {
+                const delay = 0.1 + (index * 0.05);
+                section.style.opacity = '0';
+                section.style.transform = 'translateY(20px)';
+                section.style.transition = `all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) ${delay}s`;
+                
+                setTimeout(() => {
+                    section.style.opacity = '1';
+                    section.style.transform = 'translateY(0)';
+                    section.classList.add('animated');
+                }, 100);
+            }
+        });
+    };
+    
+    // Run animations when page loads
+    document.addEventListener('DOMContentLoaded', animateSections);
+</script>
+{% endblock %}

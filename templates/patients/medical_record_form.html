@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ title }} - Smart Clinic{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/forms.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="form-header">
+        <h1 class="form-title slide-up">{{ title }}</h1>
+        <p class="form-subtitle slide-up" style="animation-delay: 0.1s;">
+            Patient: {{ patient.get_full_name }} (ID: {{ patient.id }})
+        </p>
+    </div>
+    
+    <div class="form-container slide-up" style="animation-delay: 0.2s;">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            {% if form.errors %}
+            <div class="alert alert-danger">
+                <p>Please correct the errors below:</p>
+                {{ form.errors }}
+            </div>
+            {% endif %}
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="{{ form.date.id_for_label }}" class="form-label">Date</label>
+                        {{ form.date }}
+                        {% if form.date.errors %}
+                        <div class="error">{{ form.date.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="{{ form.symptoms.id_for_label }}" class="form-label">Symptoms</label>
+                {{ form.symptoms }}
+                {% if form.symptoms.errors %}
+                <div class="error">{{ form.symptoms.errors }}</div>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                <label for="{{ form.diagnosis.id_for_label }}" class="form-label">Diagnosis</label>
+                {{ form.diagnosis }}
+                {% if form.diagnosis.errors %}
+                <div class="error">{{ form.diagnosis.errors }}</div>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                <label for="{{ form.treatment.id_for_label }}" class="form-label">Treatment</label>
+                {{ form.treatment }}
+                {% if form.treatment.errors %}
+                <div class="error">{{ form.treatment.errors }}</div>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                <label for="{{ form.notes.id_for_label }}" class="form-label">Notes</label>
+                {{ form.notes }}
+                {% if form.notes.errors %}
+                <div class="error">{{ form.notes.errors }}</div>
+                {% endif %}
+            </div>
+            
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Save Record
+                </button>
+                <a href="{% url 'patients:detail' patient.id %}" class="btn btn-outline">
+                    <i class="fas fa-times"></i> Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

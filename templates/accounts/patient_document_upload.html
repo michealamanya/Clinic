@@ -1,0 +1,495 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Document Upload - Smart Clinic{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/patient-portal.css' %}">
+<style>
+    .document-upload-container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+    
+    .upload-area {
+        background: var(--glass-bg);
+        backdrop-filter: blur(12px);
+        border: 2px dashed var(--border-color);
+        border-radius: var(--border-radius);
+        padding: 3rem 2rem;
+        text-align: center;
+        cursor: pointer;
+        transition: all var(--transition-speed) cubic-bezier(0.2, 0.8, 0.2, 1);
+        margin-bottom: 2rem;
+    }
+    
+    .upload-area:hover {
+        transform: translateY(-5px);
+        border-color: var(--primary-color);
+        box-shadow: var(--hover-shadow);
+    }
+    
+    .upload-icon {
+        font-size: 3rem;
+        color: var(--primary-color);
+        margin-bottom: 1rem;
+    }
+    
+    .upload-text {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--dark-color);
+        margin-bottom: 0.5rem;
+    }
+    
+    .upload-subtext {
+        color: var(--secondary-color);
+        margin-bottom: 1.5rem;
+    }
+    
+    .upload-form {
+        display: none;
+    }
+    
+    .document-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .document-card {
+        background: var(--glass-bg);
+        backdrop-filter: blur(12px);
+        border: 1px solid var(--glass-border);
+        border-radius: var(--border-radius);
+        overflow: hidden;
+        transition: all var(--transition-speed) cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+    
+    .document-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--hover-shadow);
+    }
+    
+    .document-preview {
+        height: 160px;
+        background-color: #f8f9fa;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    .document-preview i {
+        font-size: 3rem;
+        color: var(--secondary-color);
+    }
+    
+    .document-info {
+        padding: 1.25rem;
+    }
+    
+    .document-name {
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: var(--dark-color);
+        font-size: 1.1rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    .document-meta {
+        color: var(--secondary-color);
+        font-size: 0.9rem;
+        margin-bottom: 1rem;
+    }
+    
+    .document-actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+    
+    .document-status {
+        margin-top: 0.75rem;
+        font-size: 0.85rem;
+        padding: 0.25rem 0.5rem;
+        border-radius: 20px;
+        display: inline-block;
+    }
+    
+    .status-pending {
+        background-color: rgba(243, 156, 18, 0.1);
+        color: #f39c12;
+    }
+    
+    .status-reviewed {
+        background-color: rgba(46, 204, 113, 0.1);
+        color: #2ecc71;
+    }
+    
+    .category-filter {
+        background: var(--glass-bg);
+        backdrop-filter: blur(12px);
+        border: 1px solid var(--glass-border);
+        border-radius: var(--border-radius);
+        padding: 1rem;
+        margin-bottom: 2rem;
+    }
+    
+    .filter-title {
+        font-weight: 600;
+        margin-bottom: 1rem;
+        font-size: 1.1rem;
+    }
+    
+    .category-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+    
+    .category-btn {
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        background-color: #f8f9fa;
+        border: 1px solid #e9ecef;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-size: 0.9rem;
+    }
+    
+    .category-btn.active {
+        background-color: var(--primary-color);
+        color: white;
+        border-color: var(--primary-color);
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 3rem;
+        background-color: #f8f9fa;
+        border-radius: var(--border-radius);
+        margin: 2rem 0;
+    }
+    
+    .empty-state i {
+        font-size: 3rem;
+        color: var(--secondary-color);
+        margin-bottom: 1rem;
+    }
+    
+    .empty-state-title {
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+        color: var(--dark-color);
+    }
+    
+    .empty-state-description {
+        color: var(--secondary-color);
+        max-width: 500px;
+        margin: 0 auto;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="document-upload-container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="page-title">Document Upload</h1>
+        <div>
+            <a href="{% url 'dashboard:index' %}" class="btn btn-outline-primary">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+    </div>
+    
+    <!-- Information Alert -->
+    <div class="alert alert-info" role="alert">
+        <i class="fas fa-info-circle"></i> 
+        Upload your medical documents securely for your doctor to review. Accepted file types: PDF, JPG, PNG, DOCX.
+    </div>
+    
+    <!-- Upload Area -->
+    <div class="upload-area" id="uploadArea">
+        <div class="upload-icon">
+            <i class="fas fa-cloud-upload-alt"></i>
+        </div>
+        <div class="upload-text">Drag and drop files here</div>
+        <div class="upload-subtext">or click to browse your computer</div>
+        <button class="btn btn-primary">
+            <i class="fas fa-plus"></i> Select Files
+        </button>
+    </div>
+    
+    <!-- Upload Form (Hidden) -->
+    <form class="upload-form" id="uploadForm" enctype="multipart/form-data" method="post" action="{% url 'accounts:patient_document_upload' %}">
+        {% csrf_token %}
+        <input type="file" id="fileInput" name="files" multiple style="display: none;">
+        <div class="form-group">
+            <label for="documentType">Document Type</label>
+            <select class="form-control" id="documentType" name="document_type" required>
+                <option value="">Select a document type</option>
+                {% for type_id, type_name in document_types %}
+                    <option value="{{ type_id }}">{{ type_name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="documentDescription">Description</label>
+            <textarea class="form-control" id="documentDescription" name="description" rows="3" placeholder="Add a brief description of the document"></textarea>
+        </div>
+        
+        <div class="form-group">
+            <label for="documentDate">Document Date</label>
+            <input type="date" class="form-control" id="documentDate" name="date" value="{{ today_date|date:'Y-m-d' }}">
+        </div>
+        
+        <div class="form-check mb-3">
+            <input class="form-check-input" type="checkbox" id="shareWithDoctors" name="share_with_doctors" checked>
+            <label class="form-check-label" for="shareWithDoctors">
+                Share with my healthcare team
+            </label>
+        </div>
+        
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-upload"></i> Upload Document
+            </button>
+            <button type="button" class="btn btn-light" id="cancelUpload">
+                Cancel
+            </button>
+        </div>
+    </form>
+    
+    <!-- Filter Options -->
+    <div class="category-filter">
+        <div class="filter-title">Filter Documents</div>
+        <div class="category-buttons">
+            <a href="?category=all" class="category-btn {% if selected_category == 'all' or not selected_category %}active{% endif %}">All Documents</a>
+            {% for type_id, type_name in document_types %}
+                <a href="?category={{ type_id }}" class="category-btn {% if selected_category == type_id %}active{% endif %}">{{ type_name }}</a>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <!-- Document Grid -->
+    <h2 class="section-title mb-4">My Documents</h2>
+    
+    {% if documents %}
+        <div class="document-grid">
+            {% for document in documents %}
+                <div class="document-card">
+                    <div class="document-preview">
+                        {% if document.file_type == 'pdf' %}
+                            <i class="fas fa-file-pdf"></i>
+                        {% elif document.file_type == 'image' %}
+                            <i class="fas fa-file-image"></i>
+                        {% elif document.file_type == 'doc' or document.file_type == 'docx' %}
+                            <i class="fas fa-file-word"></i>
+                        {% else %}
+                            <i class="fas fa-file-medical"></i>
+                        {% endif %}
+                    </div>
+                    <div class="document-info">
+                        <div class="document-name">{{ document.filename }}</div>
+                        <div class="document-meta">
+                            <div>{{ document.document_type_name }} • {{ document.file_size }}</div>
+                            <div>Uploaded: {{ document.upload_date|date:"M d, Y" }}</div>
+                        </div>
+                        <div class="document-actions">
+                            <a href="{{ document.file.url }}" class="btn btn-sm btn-primary" download>
+                                <i class="fas fa-download"></i> Download
+                            </a>
+                            <form style="display: inline;" method="post" action="{% url 'accounts:patient_document_delete' document.id %}" onsubmit="return confirm('Are you sure you want to delete this document?');">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-light">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+                        <div class="document-status {% if document.status == 'reviewed' %}status-reviewed{% else %}status-pending{% endif %}">
+                            {% if document.status == 'reviewed' %}
+                                <i class="fas fa-check-circle"></i> Reviewed by Dr. {{ document.reviewed_by }}
+                            {% else %}
+                                <i class="fas fa-clock"></i> Pending Review
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <i class="fas fa-file-medical"></i>
+            <h3 class="empty-state-title">No Documents Found</h3>
+            <p class="empty-state-description">
+                {% if selected_category and selected_category != 'all' %}
+                    You haven't uploaded any documents in this category yet.
+                {% else %}
+                    You haven't uploaded any documents yet. Upload your first document using the form above.
+                {% endif %}
+            </p>
+        </div>
+    {% endif %}
+    
+    <!-- Pagination -->
+    {% if documents.has_other_pages %}
+        <nav aria-label="Document pagination" class="mt-4">
+            <ul class="pagination justify-content-center">
+                {% if documents.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ documents.previous_page_number }}{% if selected_category %}&category={{ selected_category }}{% endif %}" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link">&laquo;</span>
+                    </li>
+                {% endif %}
+                
+                {% for i in documents.paginator.page_range %}
+                    {% if documents.number == i %}
+                        <li class="page-item active">
+                            <span class="page-link">{{ i }}</span>
+                        </li>
+                    {% else %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ i }}{% if selected_category %}&category={{ selected_category }}{% endif %}">{{ i }}</a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+                
+                {% if documents.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ documents.next_page_number }}{% if selected_category %}&category={{ selected_category }}{% endif %}" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link">&raquo;</span>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const uploadArea = document.getElementById('uploadArea');
+        const uploadForm = document.getElementById('uploadForm');
+        const fileInput = document.getElementById('fileInput');
+        const cancelUpload = document.getElementById('cancelUpload');
+        
+        // Show file selection dialog when clicking on upload area
+        uploadArea.addEventListener('click', function() {
+            fileInput.click();
+        });
+        
+        // Show form when files are selected
+        fileInput.addEventListener('change', function() {
+            if (fileInput.files.length > 0) {
+                uploadArea.style.display = 'none';
+                uploadForm.style.display = 'block';
+                
+                // Remove any existing file info elements
+                const existingFileInfo = document.querySelector('.selected-files');
+                if (existingFileInfo) {
+                    existingFileInfo.remove();
+                }
+                
+                // Display selected file names
+                let fileNames = Array.from(fileInput.files).map(file => `<div>${file.name} (${formatFileSize(file.size)})</div>`).join('');
+                let fileInfo = document.createElement('div');
+                fileInfo.innerHTML = `<div class="selected-files mb-3">
+                    <div class="alert alert-success">
+                        <strong>${fileInput.files.length} files selected:</strong>
+                        ${fileNames}
+                    </div>
+                </div>`;
+                
+                uploadForm.insertBefore(fileInfo, uploadForm.firstChild);
+            }
+        });
+        
+        // Handle drag and drop events
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, preventDefaults, false);
+        });
+        
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        
+        ['dragenter', 'dragover'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, highlight, false);
+        });
+        
+        ['dragleave', 'drop'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, unhighlight, false);
+        });
+        
+        function highlight() {
+            uploadArea.classList.add('highlight');
+        }
+        
+        function unhighlight() {
+            uploadArea.classList.remove('highlight');
+        }
+        
+        uploadArea.addEventListener('drop', handleDrop, false);
+        
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            fileInput.files = files;
+            
+            // Trigger change event
+            const event = new Event('change');
+            fileInput.dispatchEvent(event);
+        }
+        
+        // Cancel upload button
+        cancelUpload.addEventListener('click', function() {
+            // Remove the file info element
+            const fileInfo = document.querySelector('.selected-files');
+            if (fileInfo) {
+                fileInfo.remove();
+            }
+            
+            // Reset form and show upload area
+            uploadForm.reset();
+            uploadForm.style.display = 'none';
+            uploadArea.style.display = 'block';
+        });
+        
+        // Show upload success message if present
+        {% if messages %}
+            {% for message in messages %}
+                {% if message.tags == 'success' %}
+                    alert("{{ message }}");
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+        
+        // Helper function to format file size
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+    });
+</script>
+{% endblock %}

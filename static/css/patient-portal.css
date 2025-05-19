@@ -1,0 +1,1088 @@
+/* Patient Portal CSS with 3D Effects */
+:root {
+    --primary-color: #3498db;
+    --primary-dark: #2980b9;
+    --secondary-color: #2ecc71;
+    --accent-color: #e74c3c;
+    --warning-color: #f39c12;
+    --info-color: #3498db;
+    --success-color: #2ecc71;
+    --danger-color: #e74c3c;
+    --bg-color: #f5f7fa;
+    --card-bg: rgba(255, 255, 255, 0.9);
+    --glass-bg: rgba(255, 255, 255, 0.7);
+    --text-color: #34495e;
+    --light-text: #7f8c8d;
+    --shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 5px 20px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.15);
+    --shadow-xl: 0 20px 50px rgba(0, 0, 0, 0.2);
+    --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    --card-corner: 12px;
+    --perspective: 1000px;
+}
+
+/* Main layout with 3D perspective */
+.full-width-dashboard {
+    perspective: var(--perspective);
+    min-height: 100vh;
+    transform-style: preserve-3d;
+    background: 
+        linear-gradient(135deg, rgba(245, 247, 250, 0.95) 0%, rgba(228, 239, 233, 0.95) 100%),
+        url('../img/clinic-background.jpg') center/cover no-repeat fixed;
+    position: relative;
+    overflow-x: hidden;
+}
+
+.full-width-dashboard::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        radial-gradient(circle at 10% 20%, rgba(52, 152, 219, 0.05) 0%, transparent 20%),
+        radial-gradient(circle at 90% 80%, rgba(46, 204, 113, 0.05) 0%, transparent 20%),
+        radial-gradient(circle at 50% 50%, rgba(231, 76, 60, 0.03) 0%, transparent 30%);
+    pointer-events: none;
+    z-index: -1;
+    animation: subtleBackgroundPulse 15s infinite alternate ease-in-out;
+}
+
+/* Add subtle animation for the background */
+@keyframes subtleBackgroundPulse {
+    0% {
+        opacity: 0.7;
+        transform: scale(1);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1.05);
+    }
+}
+
+/* 3D Enhanced Action Buttons */
+.btn {
+    display: inline-block;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    text-align: center;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transform-style: preserve-3d;
+    transform: translateZ(0);
+    transition: var(--transition);
+    border: none;
+    z-index: 1;
+}
+
+.btn:hover {
+    transform: translateZ(10px) scale(1.03);
+    box-shadow: var(--shadow-md);
+}
+
+.btn::after {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background-image: linear-gradient(120deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.3) 50%, rgba(255,255,255,0) 100%);
+    transform: translateX(-100%);
+    transition: transform 0.8s;
+    z-index: -1;
+}
+
+.btn:hover::after {
+    transform: translateX(100%);
+}
+
+.btn i {
+    margin-right: 8px;
+    transform: translateZ(5px);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    color: white;
+    box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+}
+
+.btn-danger {
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+    color: white;
+    box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+}
+
+.btn-light {
+    background: white;
+    color: var(--text-color);
+    box-shadow: var(--shadow-sm);
+}
+
+.btn-outline {
+    background: transparent;
+    border: 1px solid var(--primary-color);
+    color: var(--primary-color);
+}
+
+.btn-block {
+    display: block;
+    width: 100%;
+}
+
+/* 3D Notification System */
+.dropdown {
+    position: relative;
+    transform-style: preserve-3d;
+}
+
+.notification-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: var(--accent-color);
+    color: white;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    font-weight: 700;
+    transform: translateZ(15px);
+    box-shadow: 0 2px 5px rgba(231, 76, 60, 0.5);
+    transition: transform 0.3s ease;
+}
+
+#notificationDropdown:hover .notification-badge {
+    transform: translateZ(20px) scale(1.1);
+}
+
+.notification-dropdown {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    width: 320px;
+    background: var(--glass-bg);
+    border-radius: var(--card-corner);
+    box-shadow: var(--shadow-lg);
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px) translateZ(-10px) rotateX(-10deg);
+    transform-origin: top right;
+    transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    overflow: hidden;
+}
+
+.notification-dropdown.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) translateZ(0) rotateX(0);
+}
+
+.notification-header {
+    padding: 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.notification-title {
+    font-weight: 600;
+    margin: 0;
+    color: var(--text-color);
+}
+
+.notification-list {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.notification-item {
+    padding: 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    transform-style: preserve-3d;
+    transform: translateZ(0);
+    transition: var(--transition);
+}
+
+.notification-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateZ(5px);
+}
+
+.notification-content {
+    margin-bottom: 8px;
+    color: var(--text-color);
+    font-weight: 500;
+}
+
+.notification-time {
+    font-size: 0.8rem;
+    color: var(--light-text);
+}
+
+.view-all {
+    display: block;
+    padding: 10px;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--primary-color);
+    font-weight: 600;
+    transition: var(--transition);
+}
+
+.view-all:hover {
+    background: rgba(255, 255, 255, 0.2);
+    text-decoration: none;
+    color: var(--primary-dark);
+}
+
+/* 3D Enhanced Greeting Card */
+.greeting-card {
+    position: relative;
+    border-radius: var(--card-corner);
+    padding: 40px;
+    margin-bottom: 30px;
+    overflow: hidden;
+    transform-style: preserve-3d;
+    transform: translateZ(0);
+    transition: var(--transition);
+    box-shadow: var(--shadow-md);
+}
+
+.greeting-card:hover {
+    transform: translateZ(20px) scale(1.01);
+    box-shadow: var(--shadow-lg);
+}
+
+.greeting-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        linear-gradient(135deg, rgba(52, 152, 219, 0.7), rgba(46, 204, 113, 0.7)),
+        url('/static/img/greeting-bg.jpg') center/cover no-repeat;
+    z-index: -1;
+    transform: translateZ(-20px);
+    filter: blur(1px);
+}
+
+.greeting-content {
+    position: relative;
+    z-index: 1;
+    color: white;
+    transform-style: preserve-3d;
+}
+
+.greeting-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 15px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    transform: translateZ(30px);
+}
+
+.greeting-subtitle {
+    font-size: 1.2rem;
+    opacity: 0.9;
+    max-width: 600px;
+    margin-bottom: 30px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    transform: translateZ(20px);
+}
+
+.quick-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    transform: translateZ(25px);
+}
+
+.quick-link {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(5px);
+    border-radius: 30px;
+    padding: 10px 20px;
+    color: white;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    transition: var(--transition);
+    transform: translateZ(0);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.quick-link:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateZ(10px) translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    color: white;
+    text-decoration: none;
+}
+
+.quick-link i {
+    margin-right: 8px;
+}
+
+/* Dashboard Grid Layout */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 30px;
+    transform-style: preserve-3d;
+}
+
+.main-content-column, .sidebar-column {
+    transform-style: preserve-3d;
+}
+
+/* 3D Feature Cards */
+.feature-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+    transform-style: preserve-3d;
+}
+
+.feature-card {
+    background: var(--glass-bg);
+    border-radius: var(--card-corner);
+    padding: 25px;
+    text-align: center;
+    transform-style: preserve-3d;
+    transform: translateZ(0);
+    transition: var(--transition);
+    box-shadow: var(--shadow-md);
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    cursor: pointer;
+}
+
+.feature-card:hover {
+    transform: translateZ(30px) translateY(-10px);
+    box-shadow: var(--shadow-lg);
+    border-color: rgba(255, 255, 255, 0.4);
+}
+
+.feature-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+    transform: translateZ(5px);
+}
+
+.feature-icon {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    font-size: 28px;
+    color: white;
+    transform: translateZ(40px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.feature-card:hover .feature-icon {
+    transform: translateZ(50px) scale(1.1);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+}
+
+.feature-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: var(--text-color);
+    transform: translateZ(20px);
+}
+
+.feature-description {
+    color: var(--light-text);
+    margin-bottom: 20px;
+    transform: translateZ(15px);
+}
+
+.feature-card .btn {
+    transform: translateZ(25px);
+}
+
+/* 3D Health Tips Section */
+.health-tips-section {
+    margin: 30px 0;
+    transform-style: preserve-3d;
+}
+
+.section-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+    color: var(--text-color);
+    position: relative;
+    transform: translateZ(10px);
+}
+
+.section-title::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 0;
+    width: 50px;
+    height: 3px;
+    background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+    border-radius: 3px;
+}
+
+.health-tips-slider {
+    background: var(--glass-bg);
+    border-radius: var(--card-corner);
+    padding: 25px;
+    position: relative;
+    transform-style: preserve-3d;
+    transform: translateZ(0);
+    transition: var(--transition);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.health-tips-slider:hover {
+    transform: translateZ(10px);
+    box-shadow: var(--shadow-lg);
+}
+
+.health-tip-card {
+    text-align: center;
+    padding: 20px;
+    transform-style: preserve-3d;
+    transform: translateZ(0);
+    transition: var(--transition);
+}
+
+.tip-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 15px;
+    font-size: 24px;
+    color: white;
+    transform: translateZ(30px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.tip-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: var(--text-color);
+    transform: translateZ(20px);
+}
+
+.tip-content {
+    color: var(--light-text);
+    transform: translateZ(15px);
+}
+
+/* 3D Reminders Section */
+.reminders-section {
+    margin: 30px 0;
+    transform-style: preserve-3d;
+}
+
+.reminders-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+    transform-style: preserve-3d;
+}
+
+.reminder-card {
+    background: var(--glass-bg);
+    border-radius: var(--card-corner);
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    transform-style: preserve-3d;
+    transform: translateZ(0);
+    transition: var(--transition);
+    box-shadow: var(--shadow-md);
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.reminder-card:hover {
+    transform: translateZ(20px) translateY(-5px);
+    box-shadow: var(--shadow-lg);
+}
+
+.reminder-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+    font-size: 20px;
+    color: white;
+    transform: translateZ(25px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    flex-shrink: 0;
+}
+
+.reminder-icon.warning {
+    background: linear-gradient(135deg, #f39c12, #e67e22);
+}
+
+.reminder-icon.info {
+    background: linear-gradient(135deg, #3498db, #2980b9);
+}
+
+.reminder-content {
+    flex: 1;
+    transform: translateZ(15px);
+}
+
+.reminder-content h4 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 5px;
+    color: var(--text-color);
+}
+
+.reminder-content p {
+    color: var(--light-text);
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+/* 3D Timeline for Medical Activity */
+.timeline {
+    position: relative;
+    margin: 20px 0;
+    padding: 20px;
+    transform-style: preserve-3d;
+}
+
+.timeline::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 30px;
+    width: 2px;
+    background: linear-gradient(to bottom, 
+        rgba(52, 152, 219, 0.3), 
+        rgba(46, 204, 113, 0.3)
+    );
+    transform: translateX(-50%) translateZ(10px);
+}
+
+.timeline-item {
+    position: relative;
+    padding-left: 40px;
+    margin-bottom: 30px;
+    transform-style: preserve-3d;
+}
+
+.timeline-point {
+    position: absolute;
+    left: 0;
+    top: 5px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.7);
+    transform: translateZ(20px);
+    z-index: 1;
+}
+
+.timeline-content {
+    background: var(--glass-bg);
+    border-radius: var(--card-corner);
+    padding: 20px;
+    position: relative;
+    transform-style: preserve-3d;
+    transform: translateZ(0);
+    transition: var(--transition);
+    box-shadow: var(--shadow-md);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.timeline-content:hover {
+    transform: translateZ(15px) translateX(5px);
+    box-shadow: var(--shadow-lg);
+}
+
+.timeline-header {
+    margin-bottom: 10px;
+    transform: translateZ(10px);
+}
+
+.timeline-title {
+    font-weight: 600;
+    color: var(--text-color);
+    margin-bottom: 5px;
+}
+
+.timeline-date {
+    font-size: 0.8rem;
+    color: var(--light-text);
+}
+
+/* 3D Empty State */
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    transform-style: preserve-3d;
+}
+
+.empty-state i {
+    font-size: 3rem;
+    color: var(--light-text);
+    margin-bottom: 20px;
+    opacity: 0.5;
+    transform: translateZ(20px);
+}
+
+.empty-state-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: var(--text-color);
+    transform: translateZ(15px);
+}
+
+.empty-state-description {
+    color: var(--light-text);
+    transform: translateZ(10px);
+}
+
+/* 3D Upcoming Appointment Card */
+.upcoming-appointment {
+    background: linear-gradient(135deg, #4b6cb7, #182848);
+    border-radius: var(--card-corner);
+    overflow: hidden;
+    margin-bottom: 30px;
+    transform-style: preserve-3d;
+    transform: translateZ(0);
+    transition: var(--transition);
+    box-shadow: var(--shadow-md);
+    color: white;
+    position: relative;
+}
+
+.upcoming-appointment:hover {
+    transform: translateZ(30px) scale(1.02);
+    box-shadow: var(--shadow-lg);
+}
+
+.upcoming-header {
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.2);
+    font-size: 1.1rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    transform: translateZ(20px);
+}
+
+.upcoming-header i {
+    margin-right: 10px;
+}
+
+.upcoming-content {
+    padding: 20px;
+    transform-style: preserve-3d;
+}
+
+.appointment-doctor {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    transform: translateZ(25px);
+}
+
+.doctor-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+    font-weight: 700;
+    color: #4b6cb7;
+    font-size: 1.1rem;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.doctor-info {
+    flex: 1;
+}
+
+.doctor-name {
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.doctor-specialty {
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+.appointment-details {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    transform: translateZ(20px);
+}
+
+.detail-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 10px;
+}
+
+.appointment-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+    transform: translateZ(15px);
+}
+
+.appointment-countdown {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 15px;
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transform: translateZ(10px);
+}
+
+.countdown-label {
+    font-size: 0.9rem;
+}
+
+.countdown-timer {
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+/* 3D Video Call Card */
+.video-call-card {
+    border-radius: var(--card-corner);
+    overflow: hidden;
+    margin-bottom: 30px;
+    position: relative;
+    height: 200px;
+    transform-style: preserve-3d;
+    transform: translateZ(0);
+    transition: var(--transition);
+    box-shadow: var(--shadow-md);
+}
+
+.video-call-card:hover {
+    transform: translateZ(20px) translateY(-5px);
+    box-shadow: var(--shadow-lg);
+}
+
+.video-call-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.7)), 
+                url('/static/img/video-call-bg.jpg') center/cover no-repeat;
+    z-index: -1;
+}
+
+.video-call-content {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 20px;
+    color: white;
+    transform-style: preserve-3d;
+}
+
+.video-call-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+    transform: translateZ(25px);
+}
+
+.video-call-description {
+    opacity: 0.9;
+    margin-bottom: 20px;
+    transform: translateZ(20px);
+}
+
+.video-call-btn {
+    display: inline-flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 30px;
+    font-weight: 600;
+    backdrop-filter: blur(5px);
+    transition: var(--transition);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    transform: translateZ(15px);
+}
+
+.video-call-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateZ(25px) scale(1.05);
+    text-decoration: none;
+    color: white;
+}
+
+.video-call-btn i {
+    margin-right: 10px;
+}
+
+/* 3D Sidebar Support */
+.sidebar-support {
+    background: var(--glass-bg);
+    border-radius: var(--card-corner);
+    padding: 25px;
+    margin-top: 30px;
+    transform-style: preserve-3d;
+    transform: translateZ(0);
+    transition: var(--transition);
+    box-shadow: var(--shadow-md);
+    text-align: center;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.sidebar-support:hover {
+    transform: translateZ(15px);
+    box-shadow: var(--shadow-lg);
+}
+
+.sidebar-support-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: var(--text-color);
+    transform: translateZ(15px);
+}
+
+.sidebar-support-text {
+    color: var(--light-text);
+    margin-bottom: 20px;
+    transform: translateZ(10px);
+}
+
+/* Animations */
+.slide-up {
+    opacity: 0;
+    transform: translateY(30px);
+    animation: slideUp 0.8s forwards cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes slideUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Status badges */
+.appointment-status {
+    font-size: 0.7rem;
+    padding: 3px 8px;
+    border-radius: 20px;
+    font-weight: 700;
+    text-transform: uppercase;
+    display: inline-block;
+    transform: translateZ(5px);
+}
+
+.status-scheduled {
+    background-color: rgba(52, 152, 219, 0.2);
+    color: #3498db;
+}
+
+.status-completed {
+    background-color: rgba(46, 204, 113, 0.2);
+    color: #2ecc71;
+}
+
+.status-cancelled {
+    background-color: rgba(231, 76, 60, 0.2);
+    color: #e74c3c;
+}
+
+/* Card Styles */
+.card {
+    background: var(--glass-bg);
+    border-radius: var(--card-corner);
+    overflow: hidden;
+    margin-bottom: 20px;
+    transform-style: preserve-3d;
+    transform: translateZ(0);
+    transition: var(--transition);
+    box-shadow: var(--shadow-md);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.card:hover {
+    transform: translateZ(10px);
+    box-shadow: var(--shadow-lg);
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.card-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin: 0;
+    color: var(--text-color);
+}
+
+/* Utilities */
+.d-flex {
+    display: flex;
+}
+
+.justify-content-between {
+    justify-content: space-between;
+}
+
+.mb-4 {
+    margin-bottom: 1.5rem;
+}
+
+.me-2 {
+    margin-right: 0.5rem;
+}
+
+.position-relative {
+    position: relative;
+}
+
+/* Responsive design */
+@media (max-width: 992px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .sidebar-column {
+        order: -1;
+    }
+    
+    .greeting-card {
+        padding: 30px;
+    }
+}
+
+@media (max-width: 768px) {
+    .feature-grid {
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    }
+    
+    .greeting-title {
+        font-size: 1.8rem;
+    }
+    
+    .greeting-subtitle {
+        font-size: 1rem;
+    }
+    
+    .quick-links {
+        flex-direction: column;
+    }
+}
+
+/* Interactive ripple effect */
+.ripple-effect {
+    position: absolute;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    pointer-events: none;
+    transform: scale(0);
+    animation: ripple 0.6s linear;
+    z-index: 1;
+}
+
+@keyframes ripple {
+    to {
+        transform: scale(2);
+        opacity: 0;
+    }
+}
+
+/* Button pulse animation */
+.btn-pulse {
+    animation: btn-pulse 1s cubic-bezier(0.66, 0, 0, 1);
+}
+
+@keyframes btn-pulse {
+    0% { box-shadow: 0 0 0 0 rgba(52, 152, 219, 0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(52, 152, 219, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(52, 152, 219, 0); }
+}
+
+/* Notification pulse animation */
+.notification-pulse {
+    animation: notification-pulse 1s cubic-bezier(0.66, 0, 0, 1) 2;
+}
+
+@keyframes notification-pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}

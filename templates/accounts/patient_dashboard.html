@@ -1,0 +1,662 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Patient Portal - Smart Clinic{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/patient-portal.css' %}">
+{% endblock %}
+
+{% block content %}
+<!-- Dashboard content only - navigation comes from base template -->
+<div class="full-width-dashboard">
+    <!-- Action buttons -->
+    <div class="d-flex justify-content-between mb-4">
+        <div>
+            <a href="{% url 'appointments:create' %}" class="btn btn-primary me-2">
+                <i class="fas fa-plus-circle"></i> New Appointment
+            </a>
+            <a href="#" class="btn btn-danger">
+                <i class="fas fa-first-aid"></i> Emergency Info
+            </a>
+        </div>
+        
+        <!-- Notification dropdown -->
+        <div class="dropdown position-relative">
+            <button class="btn btn-light position-relative" id="notificationDropdown">
+                <i class="fas fa-bell"></i>
+                <span class="notification-badge">2</span>
+            </button>
+            
+            <div class="notification-dropdown" id="notificationMenu">
+                <div class="notification-header">
+                    <span class="notification-title">Notifications</span>
+                </div>
+                <div class="notification-list">
+                    <div class="notification-item">
+                        <div class="notification-content">Medication reminder: Take your evening dose</div>
+                        <div class="notification-time">Just now</div>
+                    </div>
+                    <div class="notification-item">
+                        <div class="notification-content">Upcoming appointment tomorrow</div>
+                        <div class="notification-time">1 day ago</div>
+                    </div>
+                </div>
+                <a href="#" class="view-all">View All</a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Greeting card -->
+    <div class="greeting-card slide-up">
+        <div class="greeting-background"></div>
+        <div class="greeting-content">
+            <h1 class="greeting-title">Welcome, {{ user.get_full_name }}</h1>
+            <p class="greeting-subtitle">Your health is our priority. Here's your personalized patient portal.</p>
+            
+            <div class="quick-links">
+                <a href="{% url 'accounts:patient_medical_history' %}" class="quick-link">
+                    <i class="fas fa-file-medical"></i> Medical History
+                </a>
+                <a href="{% url 'accounts:patient_prescriptions' %}" class="quick-link">
+                    <i class="fas fa-prescription-bottle-alt"></i> Prescriptions
+                </a>
+                <a href="{% url 'accounts:patient_doctors' %}" class="quick-link">
+                    <i class="fas fa-user-md"></i> Find Doctors
+                </a>
+                <a href="{% url 'accounts:patient_profile_update' %}" class="quick-link">
+                    <i class="fas fa-user-edit"></i> Update Profile
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main dashboard content arranged in columns -->
+    <div class="dashboard-grid">
+        <!-- Left column - Feature cards and health content -->
+        <div class="main-content-column">
+            <div class="feature-grid slide-up" style="animation-delay: 0.1s;">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <h3 class="feature-title">My Appointments</h3>
+                    <p class="feature-description">Schedule or manage your upcoming appointments.</p>
+                    <a href="{% url 'appointments:create' %}" class="btn btn-primary">Schedule Now</a>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-file-medical"></i>
+                    </div>
+                    <h3 class="feature-title">Medical Records</h3>
+                    <p class="feature-description">Access your personal health records and test results.</p>
+                    <a href="{% url 'accounts:patient_medical_history' %}" class="btn btn-primary">View Records</a>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-pills"></i>
+                    </div>
+                    <h3 class="feature-title">My Medications</h3>
+                    <p class="feature-description">Track your current prescriptions and medication schedule.</p>
+                    <a href="{% url 'accounts:patient_prescriptions' %}" class="btn btn-primary">View Medications</a>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-video"></i>
+                    </div>
+                    <h3 class="feature-title">Video Consultations</h3>
+                    <p class="feature-description">Connect with your doctor from the comfort of your home.</p>
+                    <a href="{% url 'accounts:patient_video_consultation' %}" class="btn btn-primary">Start Consultation</a>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-heartbeat"></i>
+                    </div>
+                    <h3 class="feature-title">Health Tracker</h3>
+                    <p class="feature-description">Monitor your vital signs and health progress over time.</p>
+                    <a href="{% url 'accounts:patient_health_tracker' %}" class="btn btn-primary">Track Health</a>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-file-upload"></i>
+                    </div>
+                    <h3 class="feature-title">Document Upload</h3>
+                    <p class="feature-description">Upload medical documents securely for your doctor.</p>
+                    <a href="{% url 'accounts:patient_document_upload' %}" class="btn btn-primary">Upload Files</a>
+                </div>
+            </div>
+            
+            <!-- Health Tips Section -->
+            <div class="health-tips-section slide-up" style="animation-delay: 0.2s; margin-top: 2rem;">
+                <h2 class="section-title">Health & Wellness Tips</h2>
+                <div class="health-tips-slider">
+                    <div class="health-tip-card">
+                        <div class="tip-icon"><i class="fas fa-heart"></i></div>
+                        <h3 class="tip-title">Heart Health</h3>
+                        <p class="tip-content">Regular physical activity can lower your blood pressure and cholesterol levels, reducing heart disease risk.</p>
+                    </div>
+                    <div class="health-tip-card">
+                        <div class="tip-icon"><i class="fas fa-brain"></i></div>
+                        <h3 class="tip-title">Mental Wellness</h3>
+                        <p class="tip-content">Practice mindfulness meditation for 10 minutes daily to reduce stress and improve mental clarity.</p>
+                    </div>
+                    <div class="health-tip-card">
+                        <div class="tip-icon"><i class="fas fa-apple-alt"></i></div>
+                        <h3 class="tip-title">Nutrition</h3>
+                        <p class="tip-content">Aim for 5 servings of fruits and vegetables daily for essential vitamins and minerals.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Important Reminders Section -->
+            <div class="reminders-section slide-up" style="animation-delay: 0.3s;">
+                <h2 class="section-title">Important Reminders</h2>
+                <div class="reminders-container">
+                    <div class="reminder-card">
+                        <div class="reminder-icon warning"><i class="fas fa-prescription"></i></div>
+                        <div class="reminder-content">
+                            <h4>Medication Refill</h4>
+                            <p>Your prescription for Metformin needs to be refilled in 3 days</p>
+                        </div>
+                    </div>
+                    <div class="reminder-card">
+                        <div class="reminder-icon info"><i class="fas fa-syringe"></i></div>
+                        <div class="reminder-content">
+                            <h4>Upcoming Vaccination</h4>
+                            <p>Your annual flu vaccination is recommended this month</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Recent Activity Section -->
+            <div class="card slide-up" style="animation-delay: 0.4s;">
+                <div class="card-header">
+                    <h2 class="card-title">Recent Medical Activity</h2>
+                </div>
+                <div class="timeline">
+                    {% for appointment in past_appointments %}
+                    <div class="timeline-item">
+                        <div class="timeline-point"></div>
+                        <div class="timeline-content">
+                            Appointment with Dr. {{ appointment.doctor.user.get_full_name }}
+                            <div class="timeline-header">
+                                <div class="timeline-title">
+                                    Appointment with Dr. {{ appointment.doctor.user.get_full_name }}
+                                </div>
+                                <div class="timeline-date">
+                                    {{ appointment.date|date:"M d, Y" }} at {{ appointment.start_time|time:"g:i A" }}
+                                </div>
+                            </div>
+                            <div class="mb-2">
+                                <span class="appointment-status status-{{ appointment.status }}">
+                                    {{ appointment.get_status_display }}
+                                </span>
+                            </div>
+                            {% if appointment.appointment_type %}
+                            <div class="mb-2">
+                                <strong>Type:</strong> {{ appointment.appointment_type.name }}
+                            </div>
+                            {% endif %}
+                            {% if appointment.notes %}
+                            <div class="mb-2">
+                                <strong>Notes:</strong> {{ appointment.notes }}
+                            </div>
+                            {% endif %}
+                            <a href="{% url 'appointments:detail' appointment.pk %}" class="btn btn-sm btn-outline">
+                                View Details
+                            </a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% if not past_appointments %}
+                <div class="empty-state">
+                    <i class="fas fa-calendar-alt"></i>
+                    <h3 class="empty-state-title">No Past Appointments</h3>
+                    <p class="empty-state-description">You don't have any past appointments yet.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Right column - Appointments and quick access -->
+        <div class="sidebar-column">
+            {% if upcoming_appointments %}
+            <div class="upcoming-appointment slide-up" style="animation-delay: 0.1s;">
+                <div class="upcoming-header">
+                    <i class="fas fa-calendar-day"></i> Your Next Appointment
+                </div>
+                
+                <div class="upcoming-content">
+                    {% with next_appointment=upcoming_appointments.0 %}
+                    <div class="appointment-doctor">
+                        <div class="doctor-avatar">
+                            {{ next_appointment.doctor.user.first_name|first }}{{ next_appointment.doctor.user.last_name|first }}
+                        </div>
+                        <div class="doctor-info">
+                            <div class="doctor-name">Dr. {{ next_appointment.doctor.user.get_full_name }}</div>
+                            <div class="doctor-specialty">{{ next_appointment.doctor.specialization }}</div>
+                        </div>
+                    </div>
+                    <div class="appointment-details">
+                        <div class="detail-icon">
+                            <i class="far fa-calendar-alt"></i>
+                        </div>
+                        <div class="detail-text">
+                            {{ next_appointment.date|date:"l, F d, Y" }}
+                        </div>
+                    </div>
+                    <div class="appointment-details">
+                        <div class="detail-icon">
+                            <i class="far fa-clock"></i>
+                        </div>
+                        <div class="detail-text">
+                            {{ next_appointment.start_time|time:"g:i A" }} - {{ next_appointment.end_time|time:"g:i A" }}
+                        </div>
+                    </div>
+                    {% if next_appointment.appointment_type %}
+                    <div class="appointment-details">
+                        <div class="detail-icon">
+                            <i class="fas fa-tag"></i>
+                        </div>
+                        <div class="detail-text">
+                            {{ next_appointment.appointment_type.name }}
+                        </div>
+                    </div>
+                    {% endif %}
+                    <div class="appointment-actions">
+                        <a href="{% url 'appointments:detail' next_appointment.pk %}" class="btn btn-primary">
+                            View Details
+                        </a>
+                        <a href="{% url 'appointments:detail' next_appointment.pk %}" class="btn btn-outline">Reschedule</a>
+                    </div>
+                    {% endwith %}
+                </div>
+            </div>
+            {% endif %}
+            
+            <div class="video-call-card slide-up" style="animation-delay: 0.2s;">
+                <div class="video-call-background"></div>
+                <div class="video-call-content">
+                    <h3 class="video-call-title">Video Consultation</h3>
+                    <p class="video-call-description">Connect with our doctors remotely through secure video calls.</p>
+                    <div class="video-call-actions">
+                        <a href="{% url 'accounts:patient_doctors' %}" class="video-call-btn">
+                            <i class="fas fa-video"></i> Schedule Call
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card slide-up" style="animation-delay: 0.3s;">
+                <div class="card-header">
+                    <h3 class="card-title">Quick Links</h3>
+                </div>
+                <ul class="nav-links" style="flex-direction: column; padding: 1rem;">
+                    <li><a href="{% url 'about_us' %}">About Us</a></li>
+                    <li><a href="{% url 'services' %}">Our Services</a></li>
+                    <li><a href="{% url 'contact_us' %}">Contact Us</a></li>
+                    <li><a href="{% url 'faq' %}">FAQs</a></li>
+                </ul>
+            </div>
+            
+            <div class="sidebar-support">
+                <h4 class="sidebar-support-title">Need Help?</h4>
+                <p class="sidebar-support-text">Contact our support team for assistance with your patient portal.</p>
+                <a href="#contact" class="btn btn-primary btn-block">Contact Support</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Toggle notifications dropdown
+    document.getElementById('notificationDropdown').addEventListener('click', function() {
+        document.getElementById('notificationMenu').classList.toggle('show');
+    });
+    
+    document.addEventListener('click', function(event) {
+        if (!event.target.matches('#notificationDropdown')) {
+            var dropdown = document.getElementById('notificationMenu');
+            if (dropdown.classList.contains('show')) {
+                dropdown.classList.remove('show');
+            }
+        }
+    });
+    
+    // Dynamic content and interactivity enhancements
+    document.addEventListener('DOMContentLoaded', function() {
+        // Dynamic greeting based on time of day
+        const greeting = document.querySelector('.greeting-title');
+        const userName = greeting.textContent.split(',')[1].trim();
+        const hour = new Date().getHours();
+        let timeGreeting = 'Welcome';
+        
+        if (hour < 12) {
+            timeGreeting = 'Good Morning';
+        } else if (hour < 18) {
+            timeGreeting = 'Good Afternoon';
+        } else {
+            timeGreeting = 'Good Evening';
+        }
+        
+        greeting.textContent = `${timeGreeting}, ${userName}`;
+        
+        // Live time updates for next appointment countdown
+        const upcomingAppointment = document.querySelector('.upcoming-appointment');
+        if (upcomingAppointment) {
+            const appointmentDateText = document.querySelector('.appointment-details .detail-text').textContent.trim();
+            const appointmentDate = new Date(appointmentDateText);
+            
+            // Add countdown element
+            const countdownDiv = document.createElement('div');
+            countdownDiv.className = 'appointment-countdown';
+            countdownDiv.innerHTML = '<div class="countdown-label">Appointment in:</div><div class="countdown-timer">Calculating...</div>';
+            document.querySelector('.appointment-actions').before(countdownDiv);
+            
+            // Update countdown every second
+            updateCountdown();
+            setInterval(updateCountdown, 1000);
+            
+            function updateCountdown() {
+                const now = new Date();
+                const diff = appointmentDate - now;
+                
+                if (diff > 0) {
+                    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+                    
+                    let countdownText = '';
+                    if (days > 0) {
+                        countdownText = `${days}d ${hours}h ${minutes}m`;
+                    } else {
+                        countdownText = `${hours}h ${minutes}m ${seconds}s`;
+                    }
+                    
+                    document.querySelector('.countdown-timer').textContent = countdownText;
+                }
+            }
+        }
+        
+        // Interactive feature cards with ripple effect
+        const featureCards = document.querySelectorAll('.feature-card');
+        featureCards.forEach(card => {
+            card.addEventListener('click', function(e) {
+                if (e.target.tagName !== 'A') { // Don't trigger on button click
+                    // Create ripple effect
+                    const ripple = document.createElement('span');
+                    ripple.classList.add('ripple-effect');
+                    
+                    const rect = this.getBoundingClientRect();
+                    const size = Math.max(rect.width, rect.height);
+                    
+                    ripple.style.width = ripple.style.height = `${size}px`;
+                    ripple.style.left = `${e.clientX - rect.left - size/2}px`;
+                    ripple.style.top = `${e.clientY - rect.top - size/2}px`;
+                    
+                    this.appendChild(ripple);
+                    
+                    setTimeout(() => {
+                        ripple.remove();
+                    }, 600);
+                    
+                    // Find the button and highlight it
+                    const btn = this.querySelector('.btn');
+                    btn.classList.add('btn-pulse');
+                    setTimeout(() => {
+                        btn.classList.remove('btn-pulse');
+                    }, 1000);
+                }
+            });
+        });
+        
+        // Dynamic health tips rotation
+        const healthTips = document.querySelectorAll('.health-tip-card');
+        let currentTipIndex = 0;
+        
+        if (healthTips.length > 0) {
+            // Initially hide all but the first tip
+            for (let i = 1; i < healthTips.length; i++) {
+                healthTips[i].style.display = 'none';
+            }
+            
+            // Show next tip every 8 seconds
+            setInterval(() => {
+                healthTips[currentTipIndex].style.opacity = '0';
+                
+                setTimeout(() => {
+                    healthTips[currentTipIndex].style.display = 'none';
+                    currentTipIndex = (currentTipIndex + 1) % healthTips.length;
+                    healthTips[currentTipIndex].style.display = 'block';
+                    
+                    setTimeout(() => {
+                        healthTips[currentTipIndex].style.opacity = '1';
+                    }, 50);
+                }, 500);
+            }, 8000);
+        }
+        
+        // Live notifications system (simulated)
+        let notificationCount = parseInt(document.querySelector('.notification-badge').textContent);
+        const notificationList = document.querySelector('.notification-list');
+        
+        // Simulate new notifications every 30-60 seconds
+        function scheduleNotification() {
+            const delay = Math.floor(Math.random() * 30000) + 30000; // 30-60 seconds
+            
+            setTimeout(() => {
+                addNewNotification();
+                scheduleNotification(); // Schedule the next one
+            }, delay);
+        }
+        
+        scheduleNotification(); // Start the notification cycle
+        
+        function addNewNotification() {
+            const notifications = [
+                'Remember to drink water regularly throughout the day.',
+                'Time for a quick stretch break. Stand up and stretch!',
+                'Your lab results are ready to view.',
+                'New message from Dr. Smith about your recent visit.',
+                'Medication reminder: Take your daily vitamins.'
+            ];
+            
+            const randomNotification = notifications[Math.floor(Math.random() * notifications.length)];
+            
+            // Create new notification item
+            const newNotification = document.createElement('div');
+            newNotification.className = 'notification-item';
+            newNotification.innerHTML = `
+                <div class="notification-content">${randomNotification}</div>
+                <div class="notification-time">Just now</div>
+            `;
+            
+            // Add sliding animation
+            newNotification.style.transform = 'translateX(100%)';
+            newNotification.style.opacity = '0';
+            
+            // Insert at the top
+            notificationList.insertBefore(newNotification, notificationList.firstChild);
+            
+            // Trigger animation
+            setTimeout(() => {
+                newNotification.style.transition = 'all 0.5s ease';
+                newNotification.style.transform = 'translateX(0)';
+                newNotification.style.opacity = '1';
+            }, 50);
+            
+            // Update notification count and badge
+            notificationCount++;
+            document.querySelector('.notification-badge').textContent = notificationCount;
+            
+            // Flash the notification icon
+            const notifButton = document.getElementById('notificationDropdown');
+            notifButton.classList.add('notification-pulse');
+            setTimeout(() => {
+                notifButton.classList.remove('notification-pulse');
+            }, 2000);
+        }
+        
+        // Interactive reminder cards
+        const reminderCards = document.querySelectorAll('.reminder-card');
+        reminderCards.forEach(card => {
+            // Add action buttons on hover
+            const actionButtons = document.createElement('div');
+            actionButtons.className = 'reminder-actions';
+            actionButtons.innerHTML = `
+                <button class="reminder-btn dismiss-btn"><i class="fas fa-check"></i></button>
+                <button class="reminder-btn snooze-btn"><i class="fas fa-clock"></i></button>
+            `;
+            
+            card.appendChild(actionButtons);
+            
+            // Add event listeners for buttons
+            card.querySelector('.dismiss-btn').addEventListener('click', function(e) {
+                e.stopPropagation();
+                card.style.transition = 'all 0.5s ease';
+                card.style.transform = 'translateX(100%)';
+                card.style.opacity = '0';
+                
+                setTimeout(() => {
+                    card.style.height = '0';
+                    card.style.margin = '0';
+                    card.style.padding = '0';
+                    card.style.overflow = 'hidden';
+                    
+                    setTimeout(() => {
+                        card.remove();
+                    }, 500);
+                }, 500);
+            });
+            
+            card.querySelector('.snooze-btn').addEventListener('click', function(e) {
+                e.stopPropagation();
+                // Visual feedback for snooze
+                this.innerHTML = '<i class="fas fa-check"></i>';
+                card.classList.add('snoozed');
+                
+                setTimeout(() => {
+                    this.innerHTML = '<i class="fas fa-clock"></i>';
+                    card.classList.remove('snoozed');
+                }, 2000);
+            });
+        });
+    });
+</script>
+
+<style>
+    /* Dynamic content styles */
+    .ripple-effect {
+        position: absolute;
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        pointer-events: none;
+        transform: scale(0);
+        animation: ripple 0.6s linear;
+        z-index: 1;
+    }
+    
+    @keyframes ripple {
+        to {
+            transform: scale(2);
+            opacity: 0;
+        }
+    }
+    
+    .btn-pulse {
+        animation: btn-pulse 1s cubic-bezier(0.66, 0, 0, 1);
+    }
+    
+    @keyframes btn-pulse {
+        0% { box-shadow: 0 0 0 0 rgba(74, 107, 255, 0.7); }
+        70% { box-shadow: 0 0 0 10px rgba(74, 107, 255, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(74, 107, 255, 0); }
+    }
+    
+    .notification-pulse {
+        animation: notification-pulse 1s cubic-bezier(0.66, 0, 0, 1) 2;
+    }
+    
+    @keyframes notification-pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+        100% { transform: scale(1); }
+    }
+    
+    .health-tip-card {
+        transition: opacity 0.5s ease;
+    }
+    
+    .appointment-countdown {
+        background-color: rgba(74, 107, 255, 0.1);
+        border-radius: 8px;
+        padding: 0.75rem;
+        margin: 1rem 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .countdown-label {
+        font-weight: 500;
+        color: var(--primary-color);
+    }
+    
+    .countdown-timer {
+        font-weight: 600;
+        color: var(--primary-dark);
+    }
+    
+    .reminder-actions {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        display: flex;
+        gap: 0.5rem;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    .reminder-card:hover .reminder-actions {
+        opacity: 1;
+    }
+    
+    .reminder-btn {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        border: none;
+        background-color: rgba(255, 255, 255, 0.8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .dismiss-btn:hover {
+        background-color: var(--success-color);
+        color: white;
+    }
+    
+    .snooze-btn:hover {
+        background-color: var(--info-color);
+        color: white;
+    }
+    
+    .snoozed {
+        opacity: 0.6;
+        transform: scale(0.98);
+    }
+</style>
+{% endblock %}

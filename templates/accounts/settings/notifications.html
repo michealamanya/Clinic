@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Notification Settings - Smart Clinic{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/settings.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="settings-container">
+    <div class="settings-sidebar">
+        <h3 class="settings-nav-title">Settings</h3>
+        <ul class="settings-nav">
+            <li class="settings-nav-item">
+                <a href="{% url 'accounts:settings' %}">
+                    <i class="fas fa-home"></i> Overview
+                </a>
+            </li>
+            <li class="settings-nav-item">
+                <a href="{% url 'accounts:settings_general' %}">
+                    <i class="fas fa-sliders-h"></i> General
+                </a>
+            </li>
+            <li class="settings-nav-item">
+                <a href="{% url 'accounts:settings_appearance' %}">
+                    <i class="fas fa-palette"></i> Appearance
+                </a>
+            </li>
+            <li class="settings-nav-item active">
+                <a href="{% url 'accounts:settings_notifications' %}">
+                    <i class="fas fa-bell"></i> Notifications
+                </a>
+            </li>
+            <li class="settings-nav-item">
+                <a href="{% url 'accounts:settings_security' %}">
+                    <i class="fas fa-shield-alt"></i> Security
+                </a>
+            </li>
+        </ul>
+    </div>
+    
+    <div class="settings-content">
+        <h1 class="settings-title">Notification Settings</h1>
+        
+        <div class="settings-form-container">
+            <form method="post" class="settings-form">
+                {% csrf_token %}
+                
+                <div class="settings-section">
+                    <h2 class="settings-section-title">Appointment Reminders</h2>
+                    
+                    <div class="setting-field checkbox-field">
+                        <div class="toggle-switch">
+                            <input type="checkbox" id="send_appointment_reminders" name="send_appointment_reminders" 
+                                   {% if settings.send_appointment_reminders|default:True %}checked{% endif %}>
+                            <label for="send_appointment_reminders" class="toggle-label"></label>
+                        </div>
+                        <label for="send_appointment_reminders">Send Appointment Reminders</label>
+                    </div>
+                    
+                    <div class="setting-field">
+                        <label for="reminder_hours_before">Hours Before Appointment to Send Reminder</label>
+                        <input type="number" id="reminder_hours_before" name="reminder_hours_before" class="form-control" value="{{ settings.reminder_hours_before|default:24 }}" min="1" max="72">
+                        <div class="field-help">How many hours before an appointment to send the reminder</div>
+                    </div>
+                </div>
+                
+                <div class="settings-section">
+                    <h2 class="settings-section-title">Staff Notifications</h2>
+                    
+                    <div class="setting-field checkbox-field">
+                        <div class="toggle-switch">
+                            <input type="checkbox" id="notify_staff_on_new_appointment" name="notify_staff_on_new_appointment" 
+                                   {% if settings.notify_staff_on_new_appointment|default:True %}checked{% endif %}>
+                            <label for="notify_staff_on_new_appointment" class="toggle-label"></label>
+                        </div>
+                        <label for="notify_staff_on_new_appointment">Notify Staff on New Appointment</label>
+                        <div class="field-help">Send email to relevant staff when a new appointment is made</div>
+                    </div>
+                    
+                    <div class="setting-field checkbox-field">
+                        <div class="toggle-switch">
+                            <input type="checkbox" id="notify_patients_on_schedule_change" name="notify_patients_on_schedule_change" 
+                                   {% if settings.notify_patients_on_schedule_change|default:True %}checked{% endif %}>
+                            <label for="notify_patients_on_schedule_change" class="toggle-label"></label>
+                        </div>
+                        <label for="notify_patients_on_schedule_change">Notify Patients on Schedule Changes</label>
+                        <div class="field-help">Send notification to patients when their appointment is modified</div>
+                    </div>
+                </div>
+                
+                <div class="settings-section">
+                    <h2 class="settings-section-title">Email Templates</h2>
+                    
+                    <div class="setting-field">
+                        <label for="appointment_reminder_template">Appointment Reminder Template</label>
+                        <textarea id="appointment_reminder_template" name="appointment_reminder_template" class="form-control" rows="6">{{ settings.appointment_reminder_template|default:"Dear {patient_name},\n\nThis is a reminder that you have an appointment with Dr. {doctor_name} on {appointment_date} at {appointment_time}.\n\nPlease arrive 15 minutes early to complete any necessary paperwork.\n\nRegards,\nThe {clinic_name} Team" }}</textarea>
+                        <div class="field-help">
+                            Available variables: {patient_name}, {doctor_name}, {appointment_date}, {appointment_time}, {clinic_name}
+                        </div>
+                    </div>
+                    
+                    <div class="setting-field">
+                        <label for="appointment_confirmation_template">Appointment Confirmation Template</label>
+                        <textarea id="appointment_confirmation_template" name="appointment_confirmation_template" class="form-control" rows="6">{{ settings.appointment_confirmation_template|default:"Dear {patient_name},\n\nYour appointment with Dr. {doctor_name} has been confirmed for {appointment_date} at {appointment_time}.\n\nRegards,\nThe {clinic_name} Team" }}</textarea>
+                        <div class="field-help">
+                            Available variables: {patient_name}, {doctor_name}, {appointment_date}, {appointment_time}, {clinic_name}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary water-ripple">
+                        <i class="fas fa-save"></i> Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Add ripple effect to button
+    document.querySelectorAll('.water-ripple').forEach(button => {
+        button.addEventListener('click', function(e) {
+            const rect = button.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            const ripple = document.createElement('span');
+            ripple.style.cssText = `
+                position: absolute;
+                background: rgba(255, 255, 255, 0.7);
+                border-radius: 50%;
+                pointer-events: none;
+                width: 10px;
+                height: 10px;
+                top: ${y}px;
+                left: ${x}px;
+                transform: translate(-50%, -50%) scale(0);
+                animation: ripple 0.6s linear;
+            `;
+            
+            button.appendChild(ripple);
+            
+            setTimeout(() => {
+                ripple.remove();
+            }, 600);
+        });
+    });
+</script>
+{% endblock %}

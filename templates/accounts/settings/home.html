@@ -1,0 +1,209 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}System Settings - Smart Clinic{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/settings.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="settings-container">
+    <div class="settings-sidebar">
+        <h3 class="settings-nav-title">Settings</h3>
+        <ul class="settings-nav">
+            <li class="settings-nav-item active">
+                <a href="{% url 'accounts:settings' %}">
+                    <i class="fas fa-home"></i> Overview
+                </a>
+            </li>
+            <li class="settings-nav-item">
+                <a href="{% url 'accounts:settings_general' %}">
+                    <i class="fas fa-sliders-h"></i> General
+                </a>
+            </li>
+            <li class="settings-nav-item">
+                <a href="{% url 'accounts:settings_appearance' %}">
+                    <i class="fas fa-palette"></i> Appearance
+                </a>
+            </li>
+            <li class="settings-nav-item">
+                <a href="{% url 'accounts:settings_notifications' %}">
+                    <i class="fas fa-bell"></i> Notifications
+                </a>
+            </li>
+            <li class="settings-nav-item">
+                <a href="{% url 'accounts:settings_security' %}">
+                    <i class="fas fa-shield-alt"></i> Security
+                </a>
+            </li>
+            <li class="settings-nav-item">
+                <a href="{% url 'accounts:settings_system_status' %}">
+                    <i class="fas fa-heartbeat"></i> System Status
+                </a>
+            </li>
+        </ul>
+    </div>
+    
+    <div class="settings-content">
+        <h1 class="settings-title">System Settings</h1>
+        
+        <div class="settings-grid">
+            <div class="settings-card">
+                <div class="settings-card-icon">
+                    <i class="fas fa-sliders-h"></i>
+                </div>
+                <div class="settings-card-content">
+                    <h3>General Settings</h3>
+                    <p>Configure basic clinic information, contact details, and operational settings.</p>
+                    <a href="{% url 'accounts:settings_general' %}" class="btn btn-primary">Configure</a>
+                </div>
+            </div>
+            
+            <div class="settings-card">
+                <div class="settings-card-icon">
+                    <i class="fas fa-palette"></i>
+                </div>
+                <div class="settings-card-content">
+                    <h3>Appearance</h3>
+                    <p>Customize colors, logo, and theme settings to match your clinic's brand.</p>
+                    <a href="{% url 'accounts:settings_appearance' %}" class="btn btn-primary">Configure</a>
+                </div>
+            </div>
+            
+            <div class="settings-card">
+                <div class="settings-card-icon">
+                    <i class="fas fa-bell"></i>
+                </div>
+                <div class="settings-card-content">
+                    <h3>Notifications</h3>
+                    <p>Manage email templates and notification settings for appointments.</p>
+                    <a href="{% url 'accounts:settings_notifications' %}" class="btn btn-primary">Configure</a>
+                </div>
+            </div>
+            
+            <div class="settings-card">
+                <div class="settings-card-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <div class="settings-card-content">
+                    <h3>Security</h3>
+                    <p>Manage password policies, account settings, and access controls.</p>
+                    <a href="{% url 'accounts:settings_security' %}" class="btn btn-primary">Configure</a>
+                </div>
+            </div>
+            
+            <div class="settings-card">
+                <div class="settings-card-icon">
+                    <i class="fas fa-database"></i>
+                </div>
+                <div class="settings-card-content">
+                    <h3>Backups</h3>
+                    <p>Configure database backup schedules and manage restoration.</p>
+                    <a href="{% url 'accounts:settings_backups' %}" class="btn btn-primary">
+                        <i class="fas fa-download"></i> Manage Backups
+                    </a>
+                </div>
+            </div>
+            
+            <div class="settings-card">
+                <div class="settings-card-icon">
+                    <i class="fas fa-sync"></i>
+                </div>
+                <div class="settings-card-content">
+                    <h3>System Status</h3>
+                    <p>View system health, logs, and performance metrics.</p>
+                    <a href="{% url 'accounts:settings_system_status' %}" class="btn btn-primary">
+                        <i class="fas fa-heartbeat"></i> Monitor
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="system-info">
+            <h2>System Information</h2>
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">Version</div>
+                    <div class="info-value">{{ system_info.version|default:"Smart Clinic v1.0.0" }}</div>
+                </div>
+                
+                <div class="info-item">
+                    <div class="info-label">Last Updated</div>
+                    <div class="info-value">
+                        {% if settings.last_updated %}
+                            {{ settings.last_updated|date:"F d, Y g:i A" }}
+                        {% else %}
+                            {% now "F d, Y g:i A" %}
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="info-item">
+                    <div class="info-label">Server Time</div>
+                    <div class="info-value" id="server-time">{% now "F d, Y g:i:s A" %}</div>
+                </div>
+                
+                <div class="info-item">
+                    <div class="info-label">Database Status</div>
+                    <div class="info-value">
+                        {% if system_info.db_connected %}
+                            <span class="status-badge success">Connected</span>
+                        {% else %}
+                            <span class="status-badge danger">Disconnected</span>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="info-item">
+                    <div class="info-label">Maintenance Mode</div>
+                    <div class="info-value">
+                        {% if settings.maintenance_mode|default:False %}
+                            <span class="status-badge danger">Active</span>
+                        {% else %}
+                            <span class="status-badge success">Inactive</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Update server time
+    function updateServerTime() {
+        const serverTimeElement = document.getElementById('server-time');
+        if (serverTimeElement) {
+            const currentTime = new Date();
+            serverTimeElement.textContent = currentTime.toLocaleString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: 'numeric',
+                minute: 'numeric',
+                second: 'numeric',
+                hour12: true
+            });
+        }
+    }
+    
+    // Update time every second
+    setInterval(updateServerTime, 1000);
+    
+    // Add water ripple effect to settings cards
+    document.querySelectorAll('.settings-card').forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            const ripple = document.createElement('div');
+            ripple.classList.add('card-ripple');
+            this.appendChild(ripple);
+            
+            setTimeout(() => {
+                ripple.remove();
+            }, 1000);
+        });
+    });
+</script>
+{% endblock %}

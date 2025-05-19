@@ -1,0 +1,253 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Appearance Settings - Smart Clinic{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/admin.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+    <div class="admin-sidebar">
+        <div class="admin-nav">
+            <div class="admin-nav-title">System Settings</div>
+            <ul class="admin-nav-links">
+                <li class="admin-nav-item">
+                    <a href="{% url 'accounts:system_settings' %}">
+                        <i class="fas fa-tachometer-alt"></i> Dashboard
+                    </a>
+                </li>
+                <li class="admin-nav-item active">
+                    <a href="{% url 'accounts:settings_appearance' %}">
+                        <i class="fas fa-palette"></i> Appearance
+                    </a>
+                </li>
+                <li class="admin-nav-item">
+                    <a href="{% url 'accounts:settings_system' %}">
+                        <i class="fas fa-cogs"></i> System Behavior
+                    </a>
+                </li>
+                <!-- ...other navigation items... -->
+            </ul>
+        </div>
+    </div>
+    
+    <div class="admin-content">
+        <div class="admin-header">
+            <h1 class="admin-title">Appearance Settings</h1>
+            <div class="admin-actions">
+                <a href="{% url 'accounts:system_settings' %}" class="btn btn-outline">
+                    <i class="fas fa-arrow-left"></i> Back to Dashboard
+                </a>
+            </div>
+        </div>
+        
+        <div class="settings-form-container">
+            <form method="post" enctype="multipart/form-data" class="settings-form">
+                {% csrf_token %}
+                
+                <div class="settings-section">
+                    <h2 class="settings-section-title">Clinic Identity</h2>
+                    
+                    <div class="setting-field">
+                        <label for="{{ form.clinic_name.id_for_label }}">Clinic Name</label>
+                        {{ form.clinic_name }}
+                        <div class="field-help">This name will appear in the header, footer, and emails</div>
+                        {% if form.clinic_name.errors %}
+                        <div class="field-error">{{ form.clinic_name.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="setting-field">
+                        <label for="{{ form.clinic_tagline.id_for_label }}">Tagline</label>
+                        {{ form.clinic_tagline }}
+                        <div class="field-help">A short slogan or description</div>
+                        {% if form.clinic_tagline.errors %}
+                        <div class="field-error">{{ form.clinic_tagline.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="setting-field">
+                        <label for="{{ form.clinic_logo.id_for_label }}">Logo</label>
+                        {% if settings.clinic_logo %}
+                        <div class="current-logo">
+                            <img src="{{ settings.clinic_logo.url }}" alt="Current logo">
+                            <div class="logo-info">Current logo</div>
+                        </div>
+                        {% endif %}
+                        {{ form.clinic_logo }}
+                        <div class="field-help">Recommended size: 200x60px</div>
+                        {% if form.clinic_logo.errors %}
+                        <div class="field-error">{{ form.clinic_logo.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="settings-section">
+                    <h2 class="settings-section-title">Theme Colors</h2>
+                    
+                    <div class="color-preview-panel">
+                        <div class="color-sample primary-sample" id="primary-sample"></div>
+                        <div class="color-sample secondary-sample" id="secondary-sample"></div>
+                        <div class="color-sample accent-sample" id="accent-sample"></div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="setting-field">
+                                <label for="{{ form.primary_color.id_for_label }}">Primary Color</label>
+                                {{ form.primary_color }}
+                                <div class="color-value" id="primary-value">{{ form.primary_color.value }}</div>
+                                {% if form.primary_color.errors %}
+                                <div class="field-error">{{ form.primary_color.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <div class="setting-field">
+                                <label for="{{ form.secondary_color.id_for_label }}">Secondary Color</label>
+                                {{ form.secondary_color }}
+                                <div class="color-value" id="secondary-value">{{ form.secondary_color.value }}</div>
+                                {% if form.secondary_color.errors %}
+                                <div class="field-error">{{ form.secondary_color.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <div class="setting-field">
+                                <label for="{{ form.accent_color.id_for_label }}">Accent Color</label>
+                                {{ form.accent_color }}
+                                <div class="color-value" id="accent-value">{{ form.accent_color.value }}</div>
+                                {% if form.accent_color.errors %}
+                                <div class="field-error">{{ form.accent_color.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-field">
+                        <label for="{{ form.enable_dark_mode.id_for_label }}">Dark Mode</label>
+                        <div class="toggle-switch">
+                            {{ form.enable_dark_mode }}
+                            <label for="{{ form.enable_dark_mode.id_for_label }}" class="toggle-label"></label>
+                        </div>
+                        <div class="field-help">Enable dark mode as default theme</div>
+                        {% if form.enable_dark_mode.errors %}
+                        <div class="field-error">{{ form.enable_dark_mode.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="settings-section">
+                    <h2 class="settings-section-title">Advanced Customization</h2>
+                    
+                    <div class="setting-field">
+                        <label for="{{ form.custom_css.id_for_label }}">Custom CSS</label>
+                        {{ form.custom_css }}
+                        <div class="field-help">Add custom CSS styles to override the default theme</div>
+                        {% if form.custom_css.errors %}
+                        <div class="field-error">{{ form.custom_css.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary water-ripple">
+                        <i class="fas fa-save"></i> Save Changes
+                    </button>
+                    <a href="{% url 'accounts:system_settings' %}" class="btn btn-outline">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Live preview of color changes
+    const updateColorPreview = () => {
+        const primaryColor = document.getElementById('{{ form.primary_color.id_for_label }}').value;
+        const secondaryColor = document.getElementById('{{ form.secondary_color.id_for_label }}').value;
+        const accentColor = document.getElementById('{{ form.accent_color.id_for_label }}').value;
+        
+        document.getElementById('primary-sample').style.backgroundColor = primaryColor;
+        document.getElementById('secondary-sample').style.backgroundColor = secondaryColor;
+        document.getElementById('accent-sample').style.backgroundColor = accentColor;
+        
+        document.getElementById('primary-value').textContent = primaryColor;
+        document.getElementById('secondary-value').textContent = secondaryColor;
+        document.getElementById('accent-value').textContent = accentColor;
+        
+        // Apply colors to preview elements
+        document.documentElement.style.setProperty('--primary-color', primaryColor);
+        document.documentElement.style.setProperty('--primary-light', primaryColor + '99');
+        document.documentElement.style.setProperty('--primary-dark', primaryColor + 'dd');
+        document.documentElement.style.setProperty('--secondary-color', secondaryColor);
+        document.documentElement.style.setProperty('--accent-color', accentColor);
+    };
+    
+    // Initialize color preview
+    updateColorPreview();
+    
+    // Update on color change
+    document.getElementById('{{ form.primary_color.id_for_label }}').addEventListener('input', updateColorPreview);
+    document.getElementById('{{ form.secondary_color.id_for_label }}').addEventListener('input', updateColorPreview);
+    document.getElementById('{{ form.accent_color.id_for_label }}').addEventListener('input', updateColorPreview);
+    
+    // Live preview of custom CSS
+    const cssTextarea = document.getElementById('{{ form.custom_css.id_for_label }}');
+    let customStyleSheet = null;
+    
+    cssTextarea.addEventListener('input', function() {
+        // Remove existing custom stylesheet if it exists
+        if (customStyleSheet) {
+            document.head.removeChild(customStyleSheet);
+        }
+        
+        // Create new stylesheet with custom CSS
+        customStyleSheet = document.createElement('style');
+        customStyleSheet.textContent = this.value;
+        document.head.appendChild(customStyleSheet);
+    });
+    
+    // Apply initial custom CSS if any
+    if (cssTextarea.value) {
+        customStyleSheet = document.createElement('style');
+        customStyleSheet.textContent = cssTextarea.value;
+        document.head.appendChild(customStyleSheet);
+    }
+    
+    // Water ripple effect for the save button
+    document.querySelectorAll('.water-ripple').forEach(button => {
+        button.addEventListener('click', function(e) {
+            const rect = button.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            const ripple = document.createElement('span');
+            ripple.style.cssText = `
+                position: absolute;
+                background: rgba(255, 255, 255, 0.7);
+                border-radius: 50%;
+                pointer-events: none;
+                width: 10px;
+                height: 10px;
+                top: ${y}px;
+                left: ${x}px;
+                transform: translate(-50%, -50%) scale(0);
+                animation: ripple 0.6s linear;
+            `;
+            
+            button.appendChild(ripple);
+            
+            setTimeout(() => {
+                ripple.remove();
+            }, 600);
+        });
+    });
+</script>
+{% endblock %}

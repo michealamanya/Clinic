@@ -1,0 +1,505 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Health Tracker - Smart Clinic{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/patient-portal.css' %}">
+<style>
+    .health-tracker-container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+    
+    .chart-container {
+        background: var(--glass-bg);
+        backdrop-filter: blur(12px);
+        border: 1px solid var(--glass-border);
+        border-radius: var(--border-radius);
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        transition: all var(--transition-speed) cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+    
+    .chart-container:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--hover-shadow);
+    }
+    
+    .chart-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+    
+    .chart-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--dark-color);
+    }
+    
+    .vitals-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .vital-card {
+        background: var(--glass-bg);
+        backdrop-filter: blur(12px);
+        border: 1px solid var(--glass-border);
+        border-radius: var(--border-radius);
+        padding: 1.5rem;
+        text-align: center;
+        transition: all var(--transition-speed) cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+    
+    .vital-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--hover-shadow);
+    }
+    
+    .vital-icon {
+        font-size: 2rem;
+        margin-bottom: 1rem;
+        color: var(--primary-color);
+        background-color: rgba(74, 107, 255, 0.1);
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+    }
+    
+    .vital-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--dark-color);
+        margin-bottom: 0.5rem;
+    }
+    
+    .vital-label {
+        font-size: 1rem;
+        color: var(--secondary-color);
+        margin-bottom: 0.75rem;
+    }
+    
+    .vital-status {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+    
+    .status-normal {
+        background-color: rgba(46, 204, 113, 0.1);
+        color: #2ecc71;
+    }
+    
+    .status-warning {
+        background-color: rgba(243, 156, 18, 0.1);
+        color: #f39c12;
+    }
+    
+    .status-alert {
+        background-color: rgba(231, 76, 60, 0.1);
+        color: #e74c3c;
+    }
+    
+    .data-form {
+        background: var(--glass-bg);
+        backdrop-filter: blur(12px);
+        border: 1px solid var(--glass-border);
+        border-radius: var(--border-radius);
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 1rem;
+    }
+    
+    .chart-filters {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .time-filter {
+        padding: 0.35rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.875rem;
+        background-color: #f8f9fa;
+        border: 1px solid #e9ecef;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    
+    .time-filter.active {
+        background-color: var(--primary-color);
+        color: white;
+        border-color: var(--primary-color);
+    }
+    
+    .historical-data {
+        background: var(--glass-bg);
+        backdrop-filter: blur(12px);
+        border: 1px solid var(--glass-border);
+        border-radius: var(--border-radius);
+        padding: 1.5rem;
+        margin-top: 2rem;
+    }
+    
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    .data-table th,
+    .data-table td {
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+    
+    .data-table th {
+        text-align: left;
+        font-weight: 600;
+        color: var(--dark-color);
+    }
+    
+    .data-table tbody tr:hover {
+        background-color: rgba(74, 107, 255, 0.05);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="health-tracker-container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="page-title">Health Tracker</h1>
+        <div>
+            <a href="{% url 'dashboard:index' %}" class="btn btn-outline-primary">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+    </div>
+    
+    <!-- Current Vitals Summary -->
+    <div class="vitals-grid">
+        <div class="vital-card">
+            <div class="vital-icon">
+                <i class="fas fa-heartbeat"></i>
+            </div>
+            <div class="vital-value">72</div>
+            <div class="vital-label">Heart Rate (bpm)</div>
+            <div class="vital-status status-normal">Normal</div>
+        </div>
+        
+        <div class="vital-card">
+            <div class="vital-icon">
+                <i class="fas fa-stethoscope"></i>
+            </div>
+            <div class="vital-value">120/80</div>
+            <div class="vital-label">Blood Pressure (mmHg)</div>
+            <div class="vital-status status-normal">Normal</div>
+        </div>
+        
+        <div class="vital-card">
+            <div class="vital-icon">
+                <i class="fas fa-temperature-high"></i>
+            </div>
+            <div class="vital-value">98.6°F</div>
+            <div class="vital-label">Temperature</div>
+            <div class="vital-status status-normal">Normal</div>
+        </div>
+        
+        <div class="vital-card">
+            <div class="vital-icon">
+                <i class="fas fa-weight"></i>
+            </div>
+            <div class="vital-value">165</div>
+            <div class="vital-label">Weight (lbs)</div>
+            <div class="vital-status status-normal">Normal</div>
+        </div>
+    </div>
+    
+    <!-- Add New Health Data Form -->
+    <div class="data-form">
+        <h2 class="section-title">Track New Health Data</h2>
+        <p class="mb-4">Record your latest health measurements to track your progress over time.</p>
+        
+        <form method="post" action="#">
+            {% csrf_token %}
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="heart_rate">Heart Rate (bpm)</label>
+                    <input type="number" class="form-control" id="heart_rate" name="heart_rate" placeholder="e.g., 72">
+                </div>
+                
+                <div class="form-group">
+                    <label for="systolic">Blood Pressure (Systolic)</label>
+                    <input type="number" class="form-control" id="systolic" name="systolic" placeholder="e.g., 120">
+                </div>
+                
+                <div class="form-group">
+                    <label for="diastolic">Blood Pressure (Diastolic)</label>
+                    <input type="number" class="form-control" id="diastolic" name="diastolic" placeholder="e.g., 80">
+                </div>
+                
+                <div class="form-group">
+                    <label for="temperature">Temperature (°F)</label>
+                    <input type="text" class="form-control" id="temperature" name="temperature" placeholder="e.g., 98.6">
+                </div>
+                
+                <div class="form-group">
+                    <label for="weight">Weight (lbs)</label>
+                    <input type="number" class="form-control" id="weight" name="weight" placeholder="e.g., 165">
+                </div>
+                
+                <div class="form-group">
+                    <label for="blood_glucose">Blood Glucose (mg/dL)</label>
+                    <input type="number" class="form-control" id="blood_glucose" name="blood_glucose" placeholder="e.g., 100">
+                </div>
+            </div>
+            
+            <div class="form-group mt-3">
+                <label for="notes">Notes</label>
+                <textarea class="form-control" id="notes" name="notes" rows="3" placeholder="Add any additional notes about your measurements or how you're feeling"></textarea>
+            </div>
+            
+            <button type="submit" class="btn btn-primary mt-3">
+                <i class="fas fa-save"></i> Save Health Data
+            </button>
+        </form>
+    </div>
+    
+    <!-- Charts Section -->
+    <div class="chart-container">
+        <div class="chart-header">
+            <h2 class="chart-title">Blood Pressure History</h2>
+            <div class="chart-filters">
+                <div class="time-filter active">Week</div>
+                <div class="time-filter">Month</div>
+                <div class="time-filter">3 Months</div>
+                <div class="time-filter">Year</div>
+            </div>
+        </div>
+        <div class="chart-body">
+            <canvas id="bpChart" height="300"></canvas>
+        </div>
+    </div>
+    
+    <div class="chart-container">
+        <div class="chart-header">
+            <h2 class="chart-title">Heart Rate & Weight History</h2>
+            <div class="chart-filters">
+                <div class="time-filter active">Week</div>
+                <div class="time-filter">Month</div>
+                <div class="time-filter">3 Months</div>
+                <div class="time-filter">Year</div>
+            </div>
+        </div>
+        <div class="chart-body">
+            <canvas id="combinedChart" height="300"></canvas>
+        </div>
+    </div>
+    
+    <!-- Historical Data Table -->
+    <div class="historical-data">
+        <h2 class="section-title mb-4">Historical Health Records</h2>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Heart Rate</th>
+                        <th>Blood Pressure</th>
+                        <th>Temperature</th>
+                        <th>Weight</th>
+                        <th>Blood Glucose</th>
+                        <th>Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>May 15, 2025</td>
+                        <td>72 bpm</td>
+                        <td>120/80 mmHg</td>
+                        <td>98.6 °F</td>
+                        <td>165 lbs</td>
+                        <td>95 mg/dL</td>
+                        <td>After morning exercise</td>
+                    </tr>
+                    <tr>
+                        <td>May 10, 2025</td>
+                        <td>75 bpm</td>
+                        <td>118/78 mmHg</td>
+                        <td>98.7 °F</td>
+                        <td>167 lbs</td>
+                        <td>98 mg/dL</td>
+                        <td>Feeling well</td>
+                    </tr>
+                    <tr>
+                        <td>May 5, 2025</td>
+                        <td>78 bpm</td>
+                        <td>122/82 mmHg</td>
+                        <td>98.5 °F</td>
+                        <td>168 lbs</td>
+                        <td>100 mg/dL</td>
+                        <td>Slight headache in the morning</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // BP Chart
+        const bpCtx = document.getElementById('bpChart').getContext('2d');
+        const bpChart = new Chart(bpCtx, {
+            type: 'line',
+            data: {
+                labels: ['May 1', 'May 5', 'May 10', 'May 15', 'May 20', 'May 25', 'Today'],
+                datasets: [
+                    {
+                        label: 'Systolic',
+                        data: [122, 125, 118, 120, 115, 118, 120],
+                        borderColor: 'rgba(231, 76, 60, 0.8)',
+                        backgroundColor: 'rgba(231, 76, 60, 0.1)',
+                        tension: 0.4,
+                        fill: false
+                    },
+                    {
+                        label: 'Diastolic',
+                        data: [82, 85, 78, 80, 75, 80, 80],
+                        borderColor: 'rgba(52, 152, 219, 0.8)',
+                        backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                        tension: 0.4,
+                        fill: false
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        min: 50,
+                        max: 150,
+                        title: {
+                            display: true,
+                            text: 'Blood Pressure (mmHg)'
+                        }
+                    }
+                }
+            }
+        });
+        
+        // Combined Chart (Heart Rate & Weight)
+        const combinedCtx = document.getElementById('combinedChart').getContext('2d');
+        const combinedChart = new Chart(combinedCtx, {
+            type: 'line',
+            data: {
+                labels: ['May 1', 'May 5', 'May 10', 'May 15', 'May 20', 'May 25', 'Today'],
+                datasets: [
+                    {
+                        label: 'Heart Rate (bpm)',
+                        data: [78, 75, 75, 72, 74, 70, 72],
+                        borderColor: 'rgba(231, 76, 60, 0.8)',
+                        backgroundColor: 'rgba(231, 76, 60, 0.1)',
+                        tension: 0.4,
+                        fill: false,
+                        yAxisID: 'y'
+                    },
+                    {
+                        label: 'Weight (lbs)',
+                        data: [170, 169, 167, 165, 165, 165, 165],
+                        borderColor: 'rgba(46, 204, 113, 0.8)',
+                        backgroundColor: 'rgba(46, 204, 113, 0.1)',
+                        tension: 0.4,
+                        fill: false,
+                        yAxisID: 'y1'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                    }
+                },
+                scales: {
+                    y: {
+                        type: 'linear',
+                        display: true,
+                        position: 'left',
+                        title: {
+                            display: true,
+                            text: 'Heart Rate (bpm)'
+                        },
+                        min: 50,
+                        max: 100
+                    },
+                    y1: {
+                        type: 'linear',
+                        display: true,
+                        position: 'right',
+                        title: {
+                            display: true,
+                            text: 'Weight (lbs)'
+                        },
+                        min: 150,
+                        max: 180,
+                        grid: {
+                            drawOnChartArea: false,
+                        }
+                    }
+                }
+            }
+        });
+        
+        // Time filter functionality
+        document.querySelectorAll('.time-filter').forEach(filter => {
+            filter.addEventListener('click', function() {
+                // Remove active class from all filters
+                document.querySelectorAll('.time-filter').forEach(f => {
+                    f.classList.remove('active');
+                });
+                
+                // Add active class to clicked filter
+                this.classList.add('active');
+                
+                // Here you would update the chart data based on the time range
+                // For demonstration purposes, we'll just show an alert
+                alert('Changing time range to: ' + this.textContent);
+            });
+        });
+    });
+</script>
+{% endblock %}

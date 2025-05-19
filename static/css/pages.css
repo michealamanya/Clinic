@@ -1,0 +1,418 @@
+/* Styles for static pages (Privacy, Terms, Contact) */
+
+.page-header {
+    position: relative;
+    background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary-dark) 100%);
+    color: white;
+    padding: 5rem 0 8rem;
+    margin-bottom: -5rem;
+    border-radius: 0 0 30% 30% / 50px;
+    overflow: hidden;
+}
+
+.page-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: repeating-linear-gradient(
+        45deg,
+        rgba(255, 255, 255, 0.05),
+        rgba(255, 255, 255, 0.05) 10px,
+        transparent 10px,
+        transparent 20px
+    );
+    animation: move-bg 15s linear infinite;
+}
+
+@keyframes move-bg {
+    0% {
+        background-position: 0 0;
+    }
+    100% {
+        background-position: 50px 50px;
+    }
+}
+
+.page-header-content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+}
+
+.page-title {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    font-weight: 700;
+}
+
+.page-subtitle {
+    font-size: 1.2rem;
+    opacity: 0.9;
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+/* Wave effect with pure CSS */
+.wave-container {
+    position: relative;
+    height: 150px;
+    margin-top: -100px;
+    margin-bottom: 30px;
+    overflow: hidden;
+}
+
+.css-wave {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100px;
+    background: var(--card-bg);
+    border-radius: 1000% 1000% 0 0;
+}
+
+.css-wave:nth-child(1) {
+    animation: wave-animation 8s linear infinite;
+    opacity: 0.7;
+    height: 140px;
+    z-index: 3;
+}
+
+.css-wave:nth-child(2) {
+    animation: wave-animation 10s linear infinite;
+    opacity: 0.5;
+    height: 120px;
+    animation-delay: -2s;
+    z-index: 2;
+}
+
+.css-wave:nth-child(3) {
+    animation: wave-animation 12s linear infinite;
+    opacity: 0.3;
+    height: 100px;
+    animation-delay: -4s;
+    z-index: 1;
+}
+
+@keyframes wave-animation {
+    0% {
+        border-radius: 1000% 1000% 0 0;
+    }
+    50% {
+        border-radius: 900% 1100% 0 0;
+    }
+    100% {
+        border-radius: 1000% 1000% 0 0;
+    }
+}
+
+/* Water droplet effect */
+.droplet {
+    position: relative;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    border-radius: var(--border-radius);
+    background: var(--card-bg);
+    box-shadow: var(--card-shadow);
+    overflow: hidden;
+    transition: all var(--transition-speed) ease;
+}
+
+.droplet::before {
+    content: '';
+    position: absolute;
+    top: -50px;
+    left: -50px;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary-dark) 100%);
+    opacity: 0.1;
+    animation: droplet-pulse 5s infinite ease-in-out;
+}
+
+.droplet::after {
+    content: '';
+    position: absolute;
+    bottom: -70px;
+    right: -70px;
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary-dark) 100%);
+    opacity: 0.1;
+    animation: droplet-pulse 7s infinite ease-in-out;
+    animation-delay: 1s;
+}
+
+@keyframes droplet-pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.2);
+    }
+}
+
+.droplet:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--hover-shadow);
+}
+
+.droplet h2 {
+    color: var(--primary-color);
+    margin-bottom: 1.5rem;
+    position: relative;
+    padding-bottom: 0.5rem;
+}
+
+.droplet h2::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 50px;
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
+}
+
+/* Terms page specific */
+.terms-section {
+    margin-bottom: 3rem;
+}
+
+.terms-section h2 {
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+}
+
+.terms-section p {
+    margin-bottom: 1rem;
+    line-height: 1.7;
+}
+
+.terms-section ul {
+    padding-left: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.terms-section li {
+    margin-bottom: 0.5rem;
+    line-height: 1.7;
+}
+
+/* Contact page specific */
+.contact-container {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+@media (min-width: 992px) {
+    .contact-container {
+        grid-template-columns: 1fr 2fr;
+    }
+}
+
+.contact-info {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.contact-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    transition: all var(--transition-speed) ease;
+}
+
+.contact-item:hover {
+    transform: translateX(5px);
+}
+
+.contact-icon {
+    width: 50px;
+    height: 50px;
+    background-color: rgba(52, 152, 219, 0.1);
+    color: var(--primary-color);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+}
+
+.contact-content {
+    flex: 1;
+}
+
+.contact-title {
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.contact-text {
+    color: var(--light-text);
+    line-height: 1.6;
+}
+
+.contact-form {
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
+    box-shadow: var(--card-shadow);
+    padding: 2rem;
+    transition: all var(--transition-speed) ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.contact-form:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--hover-shadow);
+}
+
+.contact-form-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    position: relative;
+    padding-bottom: 0.5rem;
+}
+
+.contact-form-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 50px;
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
+}
+
+.contact-form::before {
+    content: '';
+    position: absolute;
+    top: -100px;
+    right: -100px;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary-dark) 100%);
+    opacity: 0.05;
+}
+
+.water-btn {
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--border-radius);
+    background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary-dark) 100%);
+    color: white;
+    padding: 0.8rem 1.5rem;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-speed) ease;
+    z-index: 1;
+}
+
+.water-btn:hover {
+    box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+    transform: translateY(-2px);
+}
+
+.water-btn::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 5px;
+    height: 5px;
+    background: rgba(255, 255, 255, 0.5);
+    opacity: 0;
+    border-radius: 100%;
+    transform: scale(1);
+    transition: all 0s;
+}
+
+.water-btn:active::after {
+    animation: btn-ripple 0.6s linear;
+    opacity: 1;
+}
+
+@keyframes btn-ripple {
+    0% {
+        transform: translate(-50%, -50%) scale(0);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(20);
+        opacity: 0;
+    }
+}
+
+/* Map style */
+.map-container {
+    height: 300px;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    margin-top: 2rem;
+    box-shadow: var(--card-shadow);
+    animation: float 3s infinite ease-in-out;
+    background: var(--light-text);
+    position: relative;
+}
+
+.map-container::after {
+    content: 'Map Loading...';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-weight: 500;
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+/* Water ripple effect on hover elements */
+.ripple-hover {
+    position: relative;
+    overflow: hidden;
+}
+
+.ripple-hover::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 5px;
+    height: 5px;
+    background: rgba(52, 152, 219, 0.2);
+    opacity: 0;
+    border-radius: 100%;
+    transform: scale(1);
+    animation: ripple-out 2s infinite ease-out;
+}
+
+@keyframes ripple-out {
+    0% {
+        transform: translate(-50%, -50%) scale(0);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(20);
+        opacity: 0;
+    }
+}

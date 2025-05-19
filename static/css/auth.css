@@ -1,0 +1,483 @@
+/* Base styling for auth pages */
+.auth-container {
+    display: flex;
+    min-height: 100vh;
+    perspective: 1000px;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    overflow: hidden;
+}
+
+.auth-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    background-image: url('../img/clinic-background.jpg');
+    background-size: cover;
+    background-position: center;
+    opacity: 0.1;
+    animation: fadeIn 1.5s ease-out, subtleFloat 15s infinite ease-in-out;
+}
+
+.auth-content {
+    margin: auto;
+    width: 100%;
+    max-width: 450px;
+    padding: 20px;
+    perspective: 1000px;
+    animation: contentSlideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    opacity: 0;
+    transform: translateY(40px);
+}
+
+/* 3D Card Effect with enhanced animations */
+.auth-card {
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 12px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2), 
+                0 5px 15px rgba(0, 0, 0, 0.1),
+                0 0 0 1px rgba(0, 0, 0, 0.05);
+    padding: 30px;
+    backdrop-filter: blur(10px);
+    transform-style: preserve-3d;
+    animation: cardRotate 15s infinite alternate ease-in-out, cardAppear 1s 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.6s ease-out;
+    opacity: 0;
+    transform: rotateX(10deg) scale(0.95);
+}
+
+.auth-card:hover {
+    animation-play-state: paused;
+    transform: rotateX(5deg) rotateY(5deg) scale(1.02);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3),
+                0 10px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* 3D Elements inside the card with staggered animations */
+.auth-header {
+    transform: translateZ(30px);
+    margin-bottom: 30px;
+    position: relative;
+    animation: elementFadeIn 0.8s 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards, headerFloat 5s 1.5s infinite ease-in-out alternate;
+    opacity: 0;
+    transform: translateZ(30px) translateY(10px);
+}
+
+.auth-title {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: #2c3e50;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+    transform: translateZ(40px);
+    animation: glowPulse 4s 1s infinite alternate;
+}
+
+.auth-subtitle {
+    color: #7f8c8d;
+    margin-bottom: 20px;
+    transform: translateZ(25px);
+    animation: subtlePulse 3s 1.5s infinite alternate;
+}
+
+.auth-form {
+    position: relative;
+    transform: translateZ(20px);
+}
+
+.form-group {
+    margin-bottom: 20px;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    animation: elementFadeIn 0.5s forwards cubic-bezier(0.16, 1, 0.3, 1);
+    opacity: 0;
+}
+
+/* Staggered animation for form groups */
+.auth-form .form-group:nth-child(1) { animation-delay: 0.6s; }
+.auth-form .form-group:nth-child(2) { animation-delay: 0.7s; }
+.auth-form .form-group:nth-child(3) { animation-delay: 0.8s; }
+.auth-form .form-group:nth-child(4) { animation-delay: 0.9s; }
+.auth-form .form-group:nth-child(5) { animation-delay: 1.0s; }
+.auth-form .form-group:nth-child(6) { animation-delay: 1.1s; }
+
+.form-group:focus-within {
+    transform: translateZ(30px);
+    animation: formGroupFocus 0.5s forwards cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.form-control {
+    height: 50px;
+    border-radius: 8px;
+    border: 1px solid #dcdfe6;
+    padding: 10px 15px;
+    font-size: 16px;
+    width: 100%;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    background: rgba(255, 255, 255, 0.8);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05) inset;
+}
+
+.form-control:focus {
+    border-color: #3498db;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.25), 
+                0 3px 8px rgba(0, 0, 0, 0.05) inset;
+    transform: translateZ(10px);
+    animation: inputFocus 0.3s forwards cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.floating-labels .form-group {
+    position: relative;
+}
+
+.floating-labels .form-label {
+    position: absolute;
+    top: 13px;
+    left: 15px;
+    color: #7f8c8d;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    pointer-events: none;
+    transform-origin: left top;
+}
+
+.floating-labels .form-control:focus + .form-label,
+.floating-labels .form-control:not(:placeholder-shown) + .form-label {
+    top: -10px;
+    left: 10px;
+    font-size: 12px;
+    background: white;
+    padding: 0 5px;
+    color: #3498db;
+    transform: translateZ(20px) scale(1.05);
+    animation: labelFloat 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    color: white;
+    border: none;
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transform: translateZ(15px);
+    box-shadow: 0 5px 15px rgba(41, 128, 185, 0.4);
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    animation: elementFadeIn 0.5s 1.2s forwards cubic-bezier(0.16, 1, 0.3, 1);
+    opacity: 0;
+}
+
+.btn-primary:hover {
+    transform: translateZ(25px) scale(1.03);
+    box-shadow: 0 8px 20px rgba(41, 128, 185, 0.6);
+    animation: buttonHover 0.5s forwards cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.btn-primary:active {
+    transform: translateZ(15px) scale(0.98);
+    box-shadow: 0 3px 10px rgba(41, 128, 185, 0.4);
+    transition: all 0.1s;
+}
+
+.auth-links {
+    margin-top: 20px;
+    text-align: center;
+    transform: translateZ(10px);
+    animation: elementFadeIn 0.5s 1.4s forwards cubic-bezier(0.16, 1, 0.3, 1);
+    opacity: 0;
+}
+
+.auth-links a {
+    color: #3498db;
+    text-decoration: none;
+    transition: all 0.3s;
+    position: relative;
+}
+
+.auth-links a:hover {
+    color: #2980b9;
+    text-decoration: underline;
+}
+
+.auth-links a::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background-color: #2980b9;
+    transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.auth-links a:hover::after {
+    width: 100%;
+    animation: linkUnderline 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.auth-divider {
+    display: flex;
+    align-items: center;
+    margin: 20px 0;
+    transform: translateZ(5px);
+    animation: elementFadeIn 0.5s 1.3s forwards cubic-bezier(0.16, 1, 0.3, 1);
+    opacity: 0;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, transparent, #dcdfe6, transparent);
+    animation: lineFadeIn 2s 1.5s infinite alternate;
+}
+
+.auth-divider span {
+    padding: 0 15px;
+    color: #7f8c8d;
+    font-size: 14px;
+}
+
+.alert {
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    transform: translateZ(15px);
+    animation: alertPulse 2s infinite alternate, elementFadeIn 0.5s 0.4s forwards cubic-bezier(0.16, 1, 0.3, 1);
+    opacity: 0;
+}
+
+.alert-danger {
+    background-color: rgba(231, 76, 60, 0.1);
+    border: 1px solid rgba(231, 76, 60, 0.2);
+    color: #c0392b;
+}
+
+.alert-warning {
+    background-color: rgba(241, 196, 15, 0.1);
+    border: 1px solid rgba(241, 196, 15, 0.2);
+    color: #d35400;
+}
+
+.alert-info {
+    background-color: rgba(52, 152, 219, 0.1);
+    border: 1px solid rgba(52, 152, 219, 0.2);
+    color: #2980b9;
+}
+
+.errorlist {
+    list-style: none;
+    padding: 0;
+    margin: 5px 0 0;
+    font-size: 0.8rem;
+    color: #e74c3c;
+    transform: translateZ(5px);
+    animation: errorShake 0.5s cubic-bezier(.36,.07,.19,.97);
+}
+
+/* Form row and column layout */
+.row {
+    display: flex;
+    margin: 0 -10px;
+    flex-wrap: wrap;
+}
+
+.col-md-6 {
+    flex: 0 0 50%;
+    padding: 0 10px;
+}
+
+@media (max-width: 768px) {
+    .col-md-6 {
+        flex: 0 0 100%;
+    }
+}
+
+/* New Animations */
+@keyframes cardAppear {
+    0% {
+        opacity: 0;
+        transform: rotateX(10deg) scale(0.95);
+    }
+    100% {
+        opacity: 1;
+        transform: rotateX(0) scale(1);
+    }
+}
+
+@keyframes cardRotate {
+    0% {
+        transform: rotateX(0deg) rotateY(0deg);
+    }
+    25% {
+        transform: rotateX(3deg) rotateY(-3deg);
+    }
+    50% {
+        transform: rotateX(-2deg) rotateY(2deg);
+    }
+    75% {
+        transform: rotateX(1deg) rotateY(-1deg);
+    }
+    100% {
+        transform: rotateX(-1deg) rotateY(3deg);
+    }
+}
+
+@keyframes elementFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px) translateZ(var(--z, 0));
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) translateZ(var(--z, 0));
+    }
+}
+
+@keyframes contentSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(40px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 0.1;
+    }
+}
+
+@keyframes subtleFloat {
+    0% {
+        transform: translateY(0) scale(1);
+    }
+    50% {
+        transform: translateY(-10px) scale(1.02);
+    }
+    100% {
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes headerFloat {
+    from {
+        transform: translateZ(30px) translateY(0);
+    }
+    to {
+        transform: translateZ(30px) translateY(-5px);
+    }
+}
+
+@keyframes formGroupFocus {
+    from {
+        transform: translateZ(20px);
+    }
+    to {
+        transform: translateZ(30px);
+    }
+}
+
+@keyframes labelFloat {
+    from {
+        transform: translateZ(0) scale(1);
+    }
+    to {
+        transform: translateZ(20px) scale(1.05);
+    }
+}
+
+@keyframes inputFocus {
+    0% {
+        transform: translateZ(0);
+    }
+    50% {
+        transform: translateZ(15px);
+    }
+    100% {
+        transform: translateZ(10px);
+    }
+}
+
+@keyframes buttonHover {
+    from {
+        transform: translateZ(15px) scale(1);
+    }
+    to {
+        transform: translateZ(25px) scale(1.03);
+    }
+}
+
+@keyframes linkUnderline {
+    from {
+        width: 0;
+    }
+    to {
+        width: 100%;
+    }
+}
+
+@keyframes errorShake {
+    10%, 90% { transform: translateX(-1px) translateZ(5px); }
+    20%, 80% { transform: translateX(2px) translateZ(5px); }
+    30%, 50%, 70% { transform: translateX(-3px) translateZ(5px); }
+    40%, 60% { transform: translateX(3px) translateZ(5px); }
+}
+
+@keyframes glowPulse {
+    from {
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+    }
+    to {
+        text-shadow: 0 0 8px rgba(52, 152, 219, 0.3), 1px 1px 2px rgba(0, 0, 0, 0.1);
+    }
+}
+
+@keyframes subtlePulse {
+    from {
+        opacity: 0.9;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes alertPulse {
+    from {
+        box-shadow: 0 0 0 rgba(231, 76, 60, 0.1);
+    }
+    to {
+        box-shadow: 0 0 10px rgba(231, 76, 60, 0.3);
+    }
+}
+
+@keyframes lineFadeIn {
+    from {
+        opacity: 0.5;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Water ripple animation */
+@keyframes ripple {
+    to {
+        transform: translate(-50%, -50%) scale(30);
+        opacity: 0;
+    }
+}

@@ -1,0 +1,165 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}General Settings - Smart Clinic{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/settings.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="settings-container">
+    <div class="settings-sidebar">
+        <h3 class="settings-nav-title">Settings</h3>
+        <ul class="settings-nav">
+            <li class="settings-nav-item">
+                <a href="{% url 'accounts:settings' %}">
+                    <i class="fas fa-home"></i> Overview
+                </a>
+            </li>
+            <li class="settings-nav-item active">
+                <a href="{% url 'accounts:settings_general' %}">
+                    <i class="fas fa-sliders-h"></i> General
+                </a>
+            </li>
+            <li class="settings-nav-item">
+                <a href="{% url 'accounts:settings_appearance' %}">
+                    <i class="fas fa-palette"></i> Appearance
+                </a>
+            </li>
+            <li class="settings-nav-item">
+                <a href="{% url 'accounts:settings_notifications' %}">
+                    <i class="fas fa-bell"></i> Notifications
+                </a>
+            </li>
+            <li class="settings-nav-item">
+                <a href="{% url 'accounts:settings_security' %}">
+                    <i class="fas fa-shield-alt"></i> Security
+                </a>
+            </li>
+        </ul>
+    </div>
+    
+    <div class="settings-content">
+        <h1 class="settings-title">General Settings</h1>
+        
+        <div class="settings-form-container">
+            <form method="post" class="settings-form">
+                {% csrf_token %}
+                
+                <div class="settings-section">
+                    <h2 class="settings-section-title">Clinic Information</h2>
+                    
+                    <div class="setting-field">
+                        <label for="clinic_name">Clinic Name</label>
+                        <input type="text" id="clinic_name" name="clinic_name" class="form-control" value="{{ settings.clinic_name|default:'Smart Clinic' }}">
+                        <div class="field-help">This name will appear in the header, footer, and emails</div>
+                    </div>
+                    
+                    <div class="setting-field">
+                        <label for="clinic_tagline">Tagline</label>
+                        <input type="text" id="clinic_tagline" name="clinic_tagline" class="form-control" value="{{ settings.clinic_tagline|default:'' }}">
+                        <div class="field-help">A short slogan or description</div>
+                    </div>
+                    
+                    <div class="setting-field">
+                        <label for="contact_email">Contact Email</label>
+                        <input type="email" id="contact_email" name="contact_email" class="form-control" value="{{ settings.contact_email|default:'info@smartclinic.com' }}">
+                    </div>
+                    
+                    <div class="setting-field">
+                        <label for="contact_phone">Contact Phone</label>
+                        <input type="tel" id="contact_phone" name="contact_phone" class="form-control" value="{{ settings.contact_phone|default:'' }}">
+                    </div>
+                    
+                    <div class="setting-field">
+                        <label for="clinic_address">Clinic Address</label>
+                        <textarea id="clinic_address" name="clinic_address" class="form-control" rows="3">{{ settings.clinic_address|default:'' }}</textarea>
+                    </div>
+                </div>
+                
+                <div class="settings-section">
+                    <h2 class="settings-section-title">Appointment Settings</h2>
+                    
+                    <div class="setting-field">
+                        <label for="appointment_buffer_minutes">Appointment Buffer Time (minutes)</label>
+                        <input type="number" id="appointment_buffer_minutes" name="appointment_buffer_minutes" class="form-control" value="{{ settings.appointment_buffer_minutes|default:15 }}" min="0" max="60">
+                        <div class="field-help">Buffer time between consecutive appointments</div>
+                    </div>
+                    
+                    <div class="setting-field">
+                        <label for="max_appointments_per_day">Maximum Appointments Per Doctor Per Day</label>
+                        <input type="number" id="max_appointments_per_day" name="max_appointments_per_day" class="form-control" value="{{ settings.max_appointments_per_day|default:20 }}" min="1" max="100">
+                    </div>
+                    
+                    <div class="setting-field checkbox-field">
+                        <div class="toggle-switch">
+                            <input type="checkbox" id="patient_registration_open" name="patient_registration_open" 
+                                   {% if settings.patient_registration_open|default:True %}checked{% endif %}>
+                            <label for="patient_registration_open" class="toggle-label"></label>
+                        </div>
+                        <label for="patient_registration_open">Allow Patient Self-Registration</label>
+                    </div>
+                    
+                    <div class="setting-field checkbox-field">
+                        <div class="toggle-switch">
+                            <input type="checkbox" id="enable_online_booking" name="enable_online_booking" 
+                                   {% if settings.enable_online_booking|default:True %}checked{% endif %}>
+                            <label for="enable_online_booking" class="toggle-label"></label>
+                        </div>
+                        <label for="enable_online_booking">Enable Online Appointment Booking</label>
+                    </div>
+                    
+                    <div class="setting-field checkbox-field">
+                        <div class="toggle-switch">
+                            <input type="checkbox" id="require_appointment_approval" name="require_appointment_approval" 
+                                   {% if settings.require_appointment_approval|default:True %}checked{% endif %}>
+                            <label for="require_appointment_approval" class="toggle-label"></label>
+                        </div>
+                        <label for="require_appointment_approval">Require Staff Approval for Online Appointments</label>
+                    </div>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary water-ripple">
+                        <i class="fas fa-save"></i> Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Add water ripple effect to buttons
+    document.querySelectorAll('.water-ripple').forEach(button => {
+        button.addEventListener('click', function(e) {
+            const rect = button.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            const ripple = document.createElement('span');
+            ripple.style.cssText = `
+                position: absolute;
+                background: rgba(255, 255, 255, 0.7);
+                border-radius: 50%;
+                pointer-events: none;
+                width: 10px;
+                height: 10px;
+                top: ${y}px;
+                left: ${x}px;
+                transform: translate(-50%, -50%) scale(0);
+                animation: ripple 0.6s linear;
+            `;
+            
+            button.appendChild(ripple);
+            
+            setTimeout(() => {
+                ripple.remove();
+            }, 600);
+        });
+    });
+</script>
+{% endblock %}

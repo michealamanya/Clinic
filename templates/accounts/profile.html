@@ -1,0 +1,279 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load accounts_extras %}
+
+{% block title %}My Profile - Smart Clinic{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/profiles.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="profile-container slide-up">
+    <div class="profile-header">
+        <div class="profile-avatar">
+            {% if user_profile.profile_picture %}
+                <img src="{{ user_profile.profile_picture.url }}" alt="{{ user.get_full_name }}">
+            {% else %}
+                <div class="avatar-placeholder">
+                    {{ user.first_name|first }}{{ user.last_name|first }}
+                </div>
+            {% endif %}
+        </div>
+        
+        <div class="profile-info">
+            <h1 class="profile-name">{{ user.get_full_name }}</h1>
+            <div class="profile-role-badge">
+                {{ user_profile.get_role_display }}
+            </div>
+            
+            {% if user_profile.specialization %}
+            <div class="profile-specialization">
+                {{ user_profile.specialization }}
+            </div>
+            {% endif %}
+            
+            <div class="profile-details">
+                {% if user_profile.department %}
+                <div class="profile-detail">
+                    <i class="fas fa-building"></i>
+                    <span>{{ user_profile.department.name }}</span>
+                </div>
+                {% endif %}
+                
+                <div class="profile-detail">
+                    <i class="fas fa-envelope"></i>
+                    <span>{{ user.email }}</span>
+                </div>
+                
+                {% if user_profile.phone %}
+                <div class="profile-detail">
+                    <i class="fas fa-phone"></i>
+                    <span>{{ user_profile.phone }}</span>
+                </div>
+                {% endif %}
+                
+                <div class="profile-detail">
+                    <i class="fas fa-calendar-check"></i>
+                    <span>Member since {{ user_profile.date_joined|date:"F d, Y" }}</span>
+                </div>
+            </div>
+            
+            <div class="profile-actions">
+                <a href="{% url 'accounts:profile_edit' %}" class="btn btn-primary water-ripple">
+                    <i class="fas fa-edit"></i> Edit Profile
+                </a>
+                
+                <a href="{% url 'password_change' %}" class="btn btn-outline">
+                    <i class="fas fa-key"></i> Change Password
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="tabs slide-up" style="animation-delay: 0.1s;">
+        <div class="tab active" data-tab="info">Profile Information</div>
+        <div class="tab" data-tab="schedules">Work Schedule</div>
+        {% if user_profile.role == 'doctor' %}
+        <div class="tab" data-tab="appointments">My Appointments</div>
+        {% endif %}
+    </div>
+    
+    <div class="tab-content active" id="info">
+        <div class="card slide-up" style="animation-delay: 0.2s;">
+            <div class="card-header">
+                <h2 class="card-title">About Me</h2>
+            </div>
+            
+            {% if user_profile.bio %}
+            <div class="bio-content">
+                {{ user_profile.bio|linebreaks }}
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <p>No bio information provided yet.</p>
+                <a href="{% url 'accounts:profile_edit' %}" class="btn btn-sm btn-outline">
+                    <i class="fas fa-plus"></i> Add Bio
+                </a>
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="card mt-3 slide-up" style="animation-delay: 0.3s;">
+            <div class="card-header">
+                <h2 class="card-title">Contact Information</h2>
+            </div>
+            
+            <div class="contact-info">
+                <div class="contact-item">
+                    <div class="contact-label">Email:</div>
+                    <div class="contact-value">{{ user.email }}</div>
+                </div>
+                
+                <div class="contact-item">
+                    <div class="contact-label">Phone:</div>
+                    <div class="contact-value">{{ user_profile.phone|default:"Not provided" }}</div>
+                </div>
+                
+                <div class="contact-item">
+                    <div class="contact-label">Address:</div>
+                    <div class="contact-value">{{ user_profile.address|default:"Not provided"|linebreaks }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="tab-content" id="schedules">
+        <div class="card slide-up">
+            <div class="card-header">
+                <h2 class="card-title">Work Schedule</h2>
+                <a href="#" class="btn btn-outline">
+                    <i class="fas fa-plus"></i> Add Schedule
+                </a>
+            </div>
+            
+            {% if schedules %}
+            <div class="schedule-list">
+                {% for schedule in schedules %}
+                <div class="schedule-day">
+                    <div class="day-name">
+                        {% if schedule.day_of_week == 0 %}Monday
+                        {% elif schedule.day_of_week == 1 %}Tuesday
+                        {% elif schedule.day_of_week == 2 %}Wednesday
+                        {% elif schedule.day_of_week == 3 %}Thursday
+                        {% elif schedule.day_of_week == 4 %}Friday
+                        {% elif schedule.day_of_week == 5 %}Saturday
+                        {% elif schedule.day_of_week == 6 %}Sunday
+                        {% endif %}
+                    </div>
+                    
+                    <div class="time-slots">
+                        <div class="time-slot {% if not schedule.is_working %}day-off{% endif %}">
+                            {% if schedule.is_working %}
+                            <div class="time-range">
+                                {{ schedule.start_time|time:"g:i A" }} - {{ schedule.end_time|time:"g:i A" }}
+                            </div>
+                            {% else %}
+                            <div class="day-off-label">Day Off</div>
+                            {% endif %}
+                            
+                            <div class="slot-actions">
+                                <a href="#" class="btn btn-sm btn-outline">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+                
+                <!-- Add missing days -->
+                {% for day_num in missing_days %}
+                <div class="schedule-day">
+                    <div class="day-name">
+                        {% if day_num == 0 %}Monday
+                        {% elif day_num == 1 %}Tuesday
+                        {% elif day_num == 2 %}Wednesday
+                        {% elif day_num == 3 %}Thursday
+                        {% elif day_num == 4 %}Friday
+                        {% elif day_num == 5 %}Saturday
+                        {% elif day_num == 6 %}Sunday
+                        {% endif %}
+                    </div>
+                    
+                    <div class="no-schedule">
+                        <a href="#" class="btn btn-sm btn-outline">
+                            <i class="fas fa-plus"></i> Add Hours
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <i class="fas fa-calendar-alt"></i>
+                <h3 class="empty-state-title">No Schedule Set</h3>
+                <p class="empty-state-description">You haven't set your working hours yet.</p>
+                <a href="#" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Set Schedule
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    {% if user_profile.role == 'doctor' %}
+    <div class="tab-content" id="appointments">
+        <div class="card slide-up">
+            <div class="card-header">
+                <h2 class="card-title">Upcoming Appointments</h2>
+                <a href="{% url 'appointments:list' %}" class="btn btn-outline">
+                    <i class="fas fa-calendar-alt"></i> View All
+                </a>
+            </div>
+            
+            <div class="upcoming-appointments">
+                <!-- This would be populated with actual appointments data -->
+                <div class="empty-state">
+                    <i class="fas fa-calendar-check"></i>
+                    <h3 class="empty-state-title">No Upcoming Appointments</h3>
+                    <p>You don't have any appointments scheduled for the upcoming days.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Tab switching functionality
+    document.querySelectorAll('.tab').forEach(tab => {
+        tab.addEventListener('click', function() {
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            // Add active class to clicked tab
+            this.classList.add('active');
+            
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            const tabId = this.getAttribute('data-tab');
+            document.getElementById(tabId).classList.add('active');
+        });
+    });
+    
+    // Add ripple effect to buttons
+    document.querySelectorAll('.water-ripple').forEach(button => {
+        button.addEventListener('click', function(e) {
+            const rect = button.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            const ripple = document.createElement('span');
+            ripple.style.cssText = `
+                position: absolute;
+                background: rgba(255, 255, 255, 0.7);
+                border-radius: 50%;
+                pointer-events: none;
+                width: 10px;
+                height: 10px;
+                top: ${y}px;
+                left: ${x}px;
+                transform: translate(-50%, -50%) scale(0);
+                animation: ripple 0.6s linear;
+            `;
+            
+            button.appendChild(ripple);
+            
+            setTimeout(() => {
+                ripple.remove();
+            }, 600);
+        });
+    });
+</script>
+{% endblock %}

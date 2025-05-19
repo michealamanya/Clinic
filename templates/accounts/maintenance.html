@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Maintenance - Smart Clinic{% endblock %}
+
+{% block content %}
+<div class="maintenance-container">
+    <div class="maintenance-card">
+        <i class="fas fa-tools maintenance-icon"></i>
+        <h1 class="maintenance-title">Maintenance in Progress</h1>
+        <p class="maintenance-message">{{ message|default:"We're currently updating our system. Please check back later." }}</p>
+        
+        <div class="maintenance-actions">
+            <a href="{% url 'accounts:login' %}" class="btn btn-outline">Staff Login</a>
+            
+            <!-- Add direct patient portal access -->
+            <a href="{% url 'accounts:login' %}?portal=patient" class="btn btn-primary">
+                <i class="fas fa-user-injured"></i> Patient Portal Access
+            </a>
+        </div>
+        
+        <p class="maintenance-note">
+            <small>Patients can still access their portal during maintenance.</small>
+        </p>
+    </div>
+</div>
+{% endblock %}

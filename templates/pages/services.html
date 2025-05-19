@@ -1,0 +1,487 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Our Services - Smart Clinic{% endblock %}
+
+{% block extra_css %}
+<style>
+    .services-section {
+        padding: 4rem 0;
+    }
+    
+    .services-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+    
+    .services-header h1 {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+        color: var(--primary-color);
+    }
+    
+    .services-header p {
+        font-size: 1.1rem;
+        max-width: 800px;
+        margin: 0 auto;
+        color: var(--secondary-color);
+    }
+    
+    .services-content {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 1.5rem;
+    }
+    
+    .services-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 2rem;
+        margin-bottom: 4rem;
+    }
+    
+    .service-card {
+        background: #fff;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        position: relative;
+    }
+    
+    .service-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+    }
+    
+    .service-card::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 5px;
+        background: var(--primary-color);
+    }
+    
+    .service-icon {
+        width: 80px;
+        height: 80px;
+        background-color: rgba(74, 107, 255, 0.1);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 2rem auto 1rem;
+        font-size: 2rem;
+        color: var(--primary-color);
+        transition: all 0.3s ease;
+    }
+    
+    .service-card:hover .service-icon {
+        transform: scale(1.1);
+        background-color: rgba(74, 107, 255, 0.15);
+    }
+    
+    .service-content {
+        padding: 1.5rem 2rem 2rem;
+        text-align: center;
+    }
+    
+    .service-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        color: var(--dark-color);
+    }
+    
+    .service-description {
+        color: var(--secondary-color);
+        margin-bottom: 1.5rem;
+    }
+    
+    .specialty-section {
+        padding: 3rem 0;
+        background-color: #f8f9fa;
+        margin: 2rem -1.5rem;
+        padding: 3rem 1.5rem;
+    }
+    
+    .specialty-header {
+        text-align: center;
+        margin-bottom: 2.5rem;
+    }
+    
+    .specialty-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 1.5rem;
+    }
+    
+    .specialty-item {
+        background: #fff;
+        border-radius: 10px;
+        padding: 1.5rem;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+        transition: transform 0.3s ease;
+    }
+    
+    .specialty-item:hover {
+        transform: translateY(-5px);
+    }
+    
+    .specialty-icon {
+        min-width: 50px;
+        height: 50px;
+        background-color: rgba(74, 107, 255, 0.1);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        color: var(--primary-color);
+    }
+    
+    .specialty-content h3 {
+        font-size: 1.1rem;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+    }
+    
+    .specialty-content p {
+        color: var(--secondary-color);
+        font-size: 0.95rem;
+        margin: 0;
+    }
+    
+    .telemedicine-section {
+        margin: 4rem 0;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 3rem;
+        align-items: center;
+    }
+    
+    .telemedicine-image {
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+    
+    .telemedicine-image img {
+        width: 100%;
+        height: auto;
+        vertical-align: middle;
+    }
+    
+    .telemedicine-content h2 {
+        color: var(--primary-color);
+        margin-bottom: 1.5rem;
+    }
+    
+    .telemedicine-features {
+        margin-top: 1.5rem;
+    }
+    
+    .telemedicine-feature {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+    
+    .telemedicine-feature i {
+        color: var(--success-color);
+        margin-right: 0.75rem;
+        font-size: 1.1rem;
+    }
+    
+    .cta-section {
+        background: linear-gradient(135deg, #4a6bff 0%, #2344e0 100%);
+        border-radius: 10px;
+        padding: 3rem;
+        text-align: center;
+        color: white;
+        margin-top: 3rem;
+        box-shadow: 0 15px 30px rgba(74, 107, 255, 0.2);
+    }
+    
+    .cta-section h2 {
+        font-size: 2rem;
+        margin-bottom: 1rem;
+    }
+    
+    .cta-section p {
+        font-size: 1.1rem;
+        max-width: 700px;
+        margin: 0 auto 1.5rem;
+        opacity: 0.9;
+    }
+    
+    .cta-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+    
+    .cta-btn {
+        padding: 0.75rem 2rem;
+        border-radius: 50px;
+        font-weight: 500;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+    
+    .cta-btn-primary {
+        background-color: white;
+        color: var(--primary-color);
+    }
+    
+    .cta-btn-primary:hover {
+        background-color: rgba(255, 255, 255, 0.9);
+        transform: translateY(-3px);
+    }
+    
+    .cta-btn-secondary {
+        background-color: transparent;
+        border: 2px solid white;
+        color: white;
+    }
+    
+    .cta-btn-secondary:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+        transform: translateY(-3px);
+    }
+    
+    @media (max-width: 768px) {
+        .telemedicine-section {
+            grid-template-columns: 1fr;
+        }
+        
+        .telemedicine-image {
+            order: -1;
+        }
+        
+        .services-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="services-section">
+    <div class="services-header">
+        <h1>Our Services</h1>
+        <p>Comprehensive healthcare services tailored to your needs</p>
+    </div>
+    
+    <div class="services-content">
+        <div class="services-grid">
+            <div class="service-card">
+                <div class="service-icon">
+                    <i class="fas fa-user-md"></i>
+                </div>
+                <div class="service-content">
+                    <h3 class="service-title">Primary Care</h3>
+                    <p class="service-description">Comprehensive healthcare services for patients of all ages, focusing on preventive care, routine check-ups, and managing chronic conditions.</p>
+                    <a href="#" class="btn btn-primary">Learn More</a>
+                </div>
+            </div>
+            
+            <div class="service-card">
+                <div class="service-icon">
+                    <i class="fas fa-heartbeat"></i>
+                </div>
+                <div class="service-content">
+                    <h3 class="service-title">Specialized Care</h3>
+                    <p class="service-description">Expert medical care in specialized fields including cardiology, orthopedics, neurology, and more for comprehensive treatment.</p>
+                    <a href="#" class="btn btn-primary">Learn More</a>
+                </div>
+            </div>
+            
+            <div class="service-card">
+                <div class="service-icon">
+                    <i class="fas fa-video"></i>
+                </div>
+                <div class="service-content">
+                    <h3 class="service-title">Telemedicine</h3>
+                    <p class="service-description">Connect with our healthcare professionals from the comfort of your home via secure video consultations.</p>
+                    <a href="#" class="btn btn-primary">Learn More</a>
+                </div>
+            </div>
+            
+            <div class="service-card">
+                <div class="service-icon">
+                    <i class="fas fa-flask"></i>
+                </div>
+                <div class="service-content">
+                    <h3 class="service-title">Laboratory Services</h3>
+                    <p class="service-description">Comprehensive diagnostic testing with state-of-the-art equipment for accurate and timely results.</p>
+                    <a href="#" class="btn btn-primary">Learn More</a>
+                </div>
+            </div>
+            
+            <div class="service-card">
+                <div class="service-icon">
+                    <i class="fas fa-x-ray"></i>
+                </div>
+                <div class="service-content">
+                    <h3 class="service-title">Imaging & Radiology</h3>
+                    <p class="service-description">Advanced imaging services including X-rays, MRI, CT scans, and ultrasound for precise diagnostics.</p>
+                    <a href="#" class="btn btn-primary">Learn More</a>
+                </div>
+            </div>
+            
+            <div class="service-card">
+                <div class="service-icon">
+                    <i class="fas fa-prescription-bottle-alt"></i>
+                </div>
+                <div class="service-content">
+                    <h3 class="service-title">Pharmacy Services</h3>
+                    <p class="service-description">Convenient on-site pharmacy with prescription management and medication counseling.</p>
+                    <a href="#" class="btn btn-primary">Learn More</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="specialty-section">
+            <div class="specialty-header">
+                <h2>Our Medical Specialties</h2>
+                <p>Specialized care from experienced healthcare professionals</p>
+            </div>
+            
+            <div class="specialty-grid">
+                <div class="specialty-item">
+                    <div class="specialty-icon">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <div class="specialty-content">
+                        <h3>Cardiology</h3>
+                        <p>Comprehensive care for heart conditions with advanced diagnostic and treatment options.</p>
+                    </div>
+                </div>
+                
+                <div class="specialty-item">
+                    <div class="specialty-icon">
+                        <i class="fas fa-bone"></i>
+                    </div>
+                    <div class="specialty-content">
+                        <h3>Orthopedics</h3>
+                        <p>Expert care for bone, joint, and muscle conditions with surgical and non-surgical treatments.</p>
+                    </div>
+                </div>
+                
+                <div class="specialty-item">
+                    <div class="specialty-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <div class="specialty-content">
+                        <h3>Neurology</h3>
+                        <p>Specialized care for disorders of the nervous system, brain, and spinal cord.</p>
+                    </div>
+                </div>
+                
+                <div class="specialty-item">
+                    <div class="specialty-icon">
+                        <i class="fas fa-lungs"></i>
+                    </div>
+                    <div class="specialty-content">
+                        <h3>Pulmonology</h3>
+                        <p>Comprehensive care for respiratory conditions and lung diseases.</p>
+                    </div>
+                </div>
+                
+                <div class="specialty-item">
+                    <div class="specialty-icon">
+                        <i class="fas fa-baby"></i>
+                    </div>
+                    <div class="specialty-content">
+                        <h3>Pediatrics</h3>
+                        <p>Specialized healthcare for infants, children, and adolescents.</p>
+                    </div>
+                </div>
+                
+                <div class="specialty-item">
+                    <div class="specialty-icon">
+                        <i class="fas fa-venus"></i>
+                    </div>
+                    <div class="specialty-content">
+                        <h3>Obstetrics & Gynecology</h3>
+                        <p>Comprehensive women's health services from routine care to specialized treatments.</p>
+                    </div>
+                </div>
+                
+                <div class="specialty-item">
+                    <div class="specialty-icon">
+                        <i class="fas fa-tooth"></i>
+                    </div>
+                    <div class="specialty-content">
+                        <h3>Dental Care</h3>
+                        <p>Complete dental services from routine check-ups to cosmetic and restorative procedures.</p>
+                    </div>
+                </div>
+                
+                <div class="specialty-item">
+                    <div class="specialty-icon">
+                        <i class="fas fa-eye"></i>
+                    </div>
+                    <div class="specialty-content">
+                        <h3>Ophthalmology</h3>
+                        <p>Comprehensive eye care including vision testing, disease treatment, and surgical options.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="telemedicine-section">
+            <div class="telemedicine-content">
+                <h2>Telemedicine Services</h2>
+                <p>Our telemedicine services bring healthcare to you, offering convenient access to our medical professionals from the comfort of your home.</p>
+                <p>Using secure video technology, you can consult with doctors, receive diagnoses, get prescriptions, and manage your health without the need to visit our clinic in person.</p>
+                
+                <div class="telemedicine-features">
+                    <div class="telemedicine-feature">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Convenient consultations from home</span>
+                    </div>
+                    <div class="telemedicine-feature">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Secure and private video platform</span>
+                    </div>
+                    <div class="telemedicine-feature">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Prescription management</span>
+                    </div>
+                    <div class="telemedicine-feature">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Follow-up care and monitoring</span>
+                    </div>
+                    <div class="telemedicine-feature">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Available for most non-emergency conditions</span>
+                    </div>
+                </div>
+                
+                <a href="#" class="btn btn-primary mt-4">Schedule a Telemedicine Appointment</a>
+            </div>
+            
+            <div class="telemedicine-image">
+                <img src="{% static 'images/telemedicine.jpg' %}" alt="Telemedicine Consultation" onerror="this.src='https://via.placeholder.com/600x400?text=Telemedicine'">
+            </div>
+        </div>
+        
+        <div class="cta-section">
+            <h2>Ready to Experience Better Healthcare?</h2>
+            <p>Schedule an appointment today and take the first step towards improved health and wellness with our comprehensive healthcare services.</p>
+            <div class="cta-buttons">
+                <a href="#" class="cta-btn cta-btn-primary">Schedule Appointment</a>
+                <a href="#" class="cta-btn cta-btn-secondary">Contact Us</a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

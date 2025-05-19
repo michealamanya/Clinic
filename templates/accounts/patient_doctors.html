@@ -1,0 +1,353 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Find a Doctor - Smart Clinic{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/patient-portal.css' %}">
+<style>
+    .doctors-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.5rem;
+        margin-top: 2rem;
+    }
+    
+    .doctor-card {
+        background: var(--glass-bg);
+        backdrop-filter: blur(12px);
+        border: 1px solid var(--glass-border);
+        border-radius: var(--card-radius);
+        overflow: hidden;
+        transition: all 0.3s ease;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .doctor-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        border-color: var(--primary-color);
+    }
+    
+    .doctor-header {
+        padding: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .doctor-avatar {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: var(--primary-color);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        font-weight: 600;
+    }
+    
+    .doctor-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 50%;
+    }
+    
+    .doctor-info {
+        flex: 1;
+    }
+    
+    .doctor-name {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+    }
+    
+    .doctor-specialty {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+    }
+    
+    .doctor-body {
+        padding: 1.5rem;
+        flex: 1;
+    }
+    
+    .doctor-department {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .doctor-department i {
+        color: var(--primary-color);
+    }
+    
+    .doctor-bio {
+        margin-bottom: 1.5rem;
+        font-size: 0.95rem;
+    }
+    
+    .doctor-footer {
+        padding: 1rem 1.5rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        display: flex;
+        justify-content: center;
+    }
+    
+    .video-call-request {
+        width: 100%;
+        padding: 0.75rem;
+        border-radius: 50px;
+        background: var(--primary-color);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+    }
+    
+    .video-call-request:hover {
+        background: var(--primary-color-dark);
+        transform: translateY(-2px);
+    }
+    
+    .filters {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+    
+    .filter-group {
+        flex: 1;
+        min-width: 200px;
+    }
+    
+    .filter-label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+    }
+    
+    .filter-select {
+        width: 100%;
+        padding: 0.75rem;
+        border-radius: 8px;
+        border: 1px solid var(--glass-border);
+        background: var(--glass-bg);
+        backdrop-filter: blur(4px);
+        color: var(--text-color);
+    }
+    
+    .search-box {
+        position: relative;
+        flex: 2;
+        min-width: 300px;
+    }
+    
+    .search-input {
+        width: 100%;
+        padding: 0.75rem 1rem 0.75rem 3rem;
+        border-radius: 8px;
+        border: 1px solid var(--glass-border);
+        background: var(--glass-bg);
+        backdrop-filter: blur(4px);
+        color: var(--text-color);
+    }
+    
+    .search-icon {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-muted);
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 3rem;
+        background: var(--glass-bg);
+        backdrop-filter: blur(12px);
+        border: 1px solid var(--glass-border);
+        border-radius: var(--card-radius);
+    }
+    
+    .empty-state i {
+        font-size: 3rem;
+        color: var(--text-muted);
+        margin-bottom: 1rem;
+    }
+    
+    .empty-state-title {
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <h1 class="page-title slide-up">Find a Doctor for Video Consultation</h1>
+        <p class="page-subtitle slide-up" style="animation-delay: 0.1s;">
+            Connect with our doctors remotely through secure video calls
+        </p>
+    </div>
+    
+    <div class="filters slide-up" style="animation-delay: 0.2s;">
+        <div class="search-box">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" class="search-input" placeholder="Search by name or specialization..." id="doctorSearch">
+        </div>
+        
+        <div class="filter-group">
+            <label class="filter-label">Department</label>
+            <select class="filter-select" id="departmentFilter">
+                <option value="">All Departments</option>
+                {% for department in departments %}
+                <option value="{{ department.id }}">{{ department.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="filter-group">
+            <label class="filter-label">Specialization</label>
+            <select class="filter-select" id="specializationFilter">
+                <option value="">All Specializations</option>
+                {% regroup doctors by specialization as specialization_list %}
+                {% for specialization in specialization_list %}
+                    {% if specialization.grouper %}
+                    <option value="{{ specialization.grouper }}">{{ specialization.grouper }}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+    
+    {% if doctors %}
+    <div class="doctors-grid slide-up" style="animation-delay: 0.3s;">
+        {% for doctor in doctors %}
+        <div class="doctor-card" 
+             data-department="{{ doctor.department.id|default:'' }}"
+             data-specialization="{{ doctor.specialization|default:'' }}">
+            <div class="doctor-header">
+                <div class="doctor-avatar">
+                    {% if doctor.profile_picture %}
+                        <img src="{{ doctor.profile_picture.url }}" alt="Dr. {{ doctor.user.get_full_name }}">
+                    {% else %}
+                        {{ doctor.user.first_name|first }}{{ doctor.user.last_name|first }}
+                    {% endif %}
+                </div>
+                <div class="doctor-info">
+                    <div class="doctor-name">Dr. {{ doctor.user.get_full_name }}</div>
+                    <div class="doctor-specialty">{{ doctor.specialization|default:"General Practitioner" }}</div>
+                </div>
+            </div>
+            
+            <div class="doctor-body">
+                {% if doctor.department %}
+                <div class="doctor-department">
+                    <i class="fas fa-hospital"></i>
+                    <span>{{ doctor.department.name }}</span>
+                </div>
+                {% endif %}
+                
+                {% if doctor.bio %}
+                <div class="doctor-bio">
+                    {{ doctor.bio|truncatewords:30 }}
+                </div>
+                {% else %}
+                <div class="doctor-bio">
+                    Experienced healthcare professional dedicated to providing exceptional patient care.
+                </div>
+                {% endif %}
+            </div>
+            
+            <div class="doctor-footer">
+                <a href="{% url 'accounts:request_video_call' doctor.id %}" class="video-call-request">
+                    <i class="fas fa-video"></i> Request Video Consultation
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state slide-up" style="animation-delay: 0.3s;">
+        <i class="fas fa-user-md"></i>
+        <h3 class="empty-state-title">No Doctors Available</h3>
+        <p class="empty-state-description">There are currently no doctors available for video consultations.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Filter doctors based on search input and filters
+    document.addEventListener('DOMContentLoaded', function() {
+        const doctorSearch = document.getElementById('doctorSearch');
+        const departmentFilter = document.getElementById('departmentFilter');
+        const specializationFilter = document.getElementById('specializationFilter');
+        const doctorCards = document.querySelectorAll('.doctor-card');
+        
+        function filterDoctors() {
+            const searchTerm = doctorSearch.value.toLowerCase();
+            const departmentValue = departmentFilter.value;
+            const specializationValue = specializationFilter.value;
+            
+            doctorCards.forEach(card => {
+                const doctorName = card.querySelector('.doctor-name').textContent.toLowerCase();
+                const doctorSpecialty = card.querySelector('.doctor-specialty').textContent.toLowerCase();
+                const department = card.dataset.department;
+                const specialization = card.dataset.specialization;
+                
+                const matchesSearch = doctorName.includes(searchTerm) || doctorSpecialty.includes(searchTerm);
+                const matchesDepartment = !departmentValue || department === departmentValue;
+                const matchesSpecialization = !specializationValue || specialization === specializationValue;
+                
+                if (matchesSearch && matchesDepartment && matchesSpecialization) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+        
+        // Add event listeners
+        doctorSearch.addEventListener('input', filterDoctors);
+        departmentFilter.addEventListener('change', filterDoctors);
+        specializationFilter.addEventListener('change', filterDoctors);
+        
+        // Apply glass effects and animations
+        doctorCards.forEach((card, index) => {
+            // Staggered animation
+            card.style.animationDelay = `${0.3 + (index * 0.1)}s`;
+            
+            // Water ripple effect on hover
+            card.addEventListener('mouseenter', function(e) {
+                const ripple = document.createElement('div');
+                ripple.className = 'water-ripple-effect';
+                ripple.style.left = '50%';
+                ripple.style.top = '50%';
+                this.appendChild(ripple);
+                
+                setTimeout(() => {
+                    ripple.remove();
+                }, 1000);
+            });
+        });
+    });
+</script>
+{% endblock %}

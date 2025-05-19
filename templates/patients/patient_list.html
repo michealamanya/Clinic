@@ -1,0 +1,170 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Patients - Smart Clinic{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/patients.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="patients-header slide-up">
+    <h1>Patients</h1>
+    <div class="header-actions">
+        <a href="{% url 'patients:create' %}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> New Patient
+        </a>
+    </div>
+</div>
+
+<div class="filters-container slide-up" style="animation-delay: 0.1s;">
+    <form method="get" class="filters-form">
+        <div class="form-group search-group">
+            <label for="search" class="form-label">Search</label>
+            <div class="search-input-group">
+                <input type="text" id="search" name="q" class="form-control" placeholder="Search by name, email, or phone..." value="{{ request.GET.q }}">
+                <button type="submit" class="search-btn">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+        </div>
+        
+        <div class="filters-group">
+            <div class="form-group">
+                <label for="gender" class="form-label">Gender</label>
+                <select id="gender" name="gender" class="form-control">
+                    <option value="">All</option>
+                    <option value="M" {% if request.GET.gender == 'M' %}selected{% endif %}>Male</option>
+                    <option value="F" {% if request.GET.gender == 'F' %}selected{% endif %}>Female</option>
+                    <option value="O" {% if request.GET.gender == 'O' %}selected{% endif %}>Other</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="blood_type" class="form-label">Blood Type</label>
+                <select id="blood_type" name="blood_type" class="form-control">
+                    <option value="">All</option>
+                    <option value="A+" {% if request.GET.blood_type == 'A+' %}selected{% endif %}>A+</option>
+                    <option value="A-" {% if request.GET.blood_type == 'A-' %}selected{% endif %}>A-</option>
+                    <option value="B+" {% if request.GET.blood_type == 'B+' %}selected{% endif %}>B+</option>
+                    <option value="B-" {% if request.GET.blood_type == 'B-' %}selected{% endif %}>B-</option>
+                    <option value="AB+" {% if request.GET.blood_type == 'AB+' %}selected{% endif %}>AB+</option>
+                    <option value="AB-" {% if request.GET.blood_type == 'AB-' %}selected{% endif %}>AB-</option>
+                    <option value="O+" {% if request.GET.blood_type == 'O+' %}selected{% endif %}>O+</option>
+                    <option value="O-" {% if request.GET.blood_type == 'O-' %}selected{% endif %}>O-</option>
+                </select>
+            </div>
+            
+            <div class="filter-actions">
+                <button type="submit" class="btn btn-primary filter-btn">
+                    <i class="fas fa-filter"></i> Filter
+                </button>
+                
+                <a href="{% url 'patients:list' %}" class="btn btn-outline">
+                    <i class="fas fa-sync"></i> Reset
+                </a>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="patient-grid slide-up" style="animation-delay: 0.2s;">
+    {% if patients %}
+        {% for patient in patients %}
+        <div class="patient-card ripple-hover">
+            <div class="patient-avatar">
+                {{ patient.first_name|first }}{{ patient.last_name|first }}
+            </div>
+            <div class="patient-details">
+                <h3 class="patient-name">
+                    <a href="{% url 'patients:detail' patient.pk %}">
+                        {{ patient.first_name }} {{ patient.last_name }}
+                    </a>
+                </h3>
+                <div class="patient-info">
+                    <div class="info-item">
+                        <i class="fas fa-birthday-cake"></i> {{ patient.date_of_birth|date:"M d, Y" }} ({{ patient.get_age }} years)
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-venus-mars"></i> {{ patient.get_gender_display }}
+                    </div>
+                    {% if patient.blood_type %}
+                    <div class="info-item">
+                        <i class="fas fa-tint"></i> {{ patient.blood_type }}
+                    </div>
+                    {% endif %}
+                    {% if patient.phone %}
+                    <div class="info-item">
+                        <i class="fas fa-phone"></i> {{ patient.phone }}
+                    </div>
+                    {% endif %}
+                    {% if patient.email %}
+                    <div class="info-item">
+                        <i class="fas fa-envelope"></i> {{ patient.email }}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="patient-actions">
+                <a href="{% url 'patients:detail' patient.pk %}" class="btn btn-sm btn-outline">
+                    <i class="fas fa-eye"></i> View
+                </a>
+                <a href="{% url 'patients:edit' patient.pk %}" class="btn btn-sm btn-outline">
+                    <i class="fas fa-edit"></i> Edit
+                </a>
+                <a href="{% url 'appointments:create' %}?patient_id={{ patient.pk }}" class="btn btn-sm btn-primary">
+                    <i class="fas fa-calendar-plus"></i> Schedule
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+        
+        <div class="pagination-container">
+            <div class="pagination">
+                <span class="step-links">
+                    {% if patients.has_previous %}
+                        <a href="?page=1{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">&laquo; first</a>
+                        <a href="?page={{ patients.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">previous</a>
+                    {% endif %}
+            
+                    <span class="current">
+                        Page {{ patients.number }} of {{ patients.paginator.num_pages }}
+                    </span>
+            
+                    {% if patients.has_next %}
+                        <a href="?page={{ patients.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">next</a>
+                        <a href="?page={{ patients.paginator.num_pages }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">last &raquo;</a>
+                    {% endif %}
+                </span>
+            </div>
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <i class="fas fa-user-injured"></i>
+            <h3 class="empty-state-title">No Patients Found</h3>
+            <p class="empty-state-description">There are no patients matching your search criteria.</p>
+            <div class="empty-state-actions">
+                <a href="{% url 'patients:list' %}" class="btn btn-outline">
+                    <i class="fas fa-sync"></i> Reset Filters
+                </a>
+                <a href="{% url 'patients:create' %}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Add Patient
+                </a>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Auto-submit filter form when dropdown changes
+    document.getElementById('gender').addEventListener('change', function() {
+        document.querySelector('.filters-form').submit();
+    });
+    
+    document.getElementById('blood_type').addEventListener('change', function() {
+        document.querySelector('.filters-form').submit();
+    });
+</script>
+{% endblock %}

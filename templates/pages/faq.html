@@ -1,0 +1,427 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Frequently Asked Questions - Smart Clinic{% endblock %}
+
+{% block extra_css %}
+<style>
+    .faq-section {
+        padding: 4rem 0;
+    }
+    
+    .faq-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+    
+    .faq-header h1 {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+        color: var(--primary-color);
+    }
+    
+    .faq-header p {
+        font-size: 1.1rem;
+        max-width: 800px;
+        margin: 0 auto;
+        color: var(--secondary-color);
+    }
+    
+    .faq-content {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 0 1.5rem;
+    }
+    
+    .faq-categories {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 1rem;
+        margin-bottom: 2.5rem;
+    }
+    
+    .category-btn {
+        padding: 0.75rem 1.5rem;
+        background-color: #f8f9fa;
+        border: none;
+        border-radius: 50px;
+        font-size: 0.95rem;
+        font-weight: 500;
+        color: var(--dark-color);
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .category-btn:hover {
+        background-color: #e9ecef;
+    }
+    
+    .category-btn.active {
+        background-color: var(--primary-color);
+        color: white;
+    }
+    
+    .faq-list {
+        margin-bottom: 3rem;
+    }
+    
+    .faq-item {
+        background: #fff;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        margin-bottom: 1.5rem;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+    
+    .faq-item:hover {
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    }
+    
+    .faq-question {
+        padding: 1.5rem;
+        position: relative;
+        cursor: pointer;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        color: var(--dark-color);
+    }
+    
+    .faq-question::after {
+        content: '\f078';
+        font-family: 'Font Awesome 5 Free';
+        font-weight: 900;
+        color: var(--primary-color);
+        transition: transform 0.3s ease;
+    }
+    
+    .faq-item.active .faq-question::after {
+        transform: rotate(180deg);
+    }
+    
+    .faq-answer {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.5s ease;
+        padding: 0 1.5rem;
+    }
+    
+    .faq-item.active .faq-answer {
+        max-height: 500px;
+        padding: 0 1.5rem 1.5rem;
+    }
+    
+    .faq-answer p {
+        margin-bottom: 1rem;
+        color: var(--secondary-color);
+        line-height: 1.6;
+    }
+    
+    .faq-answer p:last-child {
+        margin-bottom: 0;
+    }
+    
+    .search-container {
+        margin-bottom: 2.5rem;
+    }
+    
+    .search-box {
+        position: relative;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    
+    .search-input {
+        width: 100%;
+        padding: 1rem 1.5rem 1rem 3rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 50px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+    
+    .search-input:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(74, 107, 255, 0.1);
+        outline: none;
+    }
+    
+    .search-icon {
+        position: absolute;
+        left: 1.25rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--secondary-color);
+    }
+    
+    .contact-support {
+        text-align: center;
+        background: linear-gradient(135deg, #4a6bff 0%, #2344e0 100%);
+        border-radius: 10px;
+        padding: 3rem;
+        color: white;
+        margin-top: 3rem;
+        box-shadow: 0 15px 30px rgba(74, 107, 255, 0.2);
+    }
+    
+    .contact-support h2 {
+        font-size: 1.75rem;
+        margin-bottom: 1rem;
+    }
+    
+    .contact-support p {
+        font-size: 1.1rem;
+        max-width: 700px;
+        margin: 0 auto 1.5rem;
+        opacity: 0.9;
+    }
+    
+    .contact-btn {
+        display: inline-block;
+        background-color: white;
+        color: var(--primary-color);
+        padding: 0.75rem 2rem;
+        border-radius: 50px;
+        font-weight: 500;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+    
+    .contact-btn:hover {
+        background-color: rgba(255, 255, 255, 0.9);
+        transform: translateY(-3px);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="faq-section">
+    <div class="faq-header">
+        <h1>Frequently Asked Questions</h1>
+        <p>Find answers to common questions about our services, appointments, insurance, and more.</p>
+    </div>
+    
+    <div class="faq-content">
+        <div class="search-container">
+            <div class="search-box">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" id="faqSearch" class="search-input" placeholder="Search for questions...">
+            </div>
+        </div>
+        
+        <div class="faq-categories">
+            <button class="category-btn active" data-category="all">All Questions</button>
+            <button class="category-btn" data-category="appointments">Appointments</button>
+            <button class="category-btn" data-category="insurance">Insurance & Billing</button>
+            <button class="category-btn" data-category="services">Services</button>
+            <button class="category-btn" data-category="telemedicine">Telemedicine</button>
+            <button class="category-btn" data-category="covid">COVID-19</button>
+        </div>
+        
+        <div class="faq-list">
+            <div class="faq-item" data-category="appointments">
+                <div class="faq-question">How do I schedule an appointment?</div>
+                <div class="faq-answer">
+                    <p>You can schedule an appointment in several ways:</p>
+                    <ul>
+                        <li>Through our patient portal</li>
+                        <li>Calling our office at (256) -740-470-116</li>
+                        <li>Visiting our clinic in person</li>
+                        <li>Using our mobile app</li>
+                    </ul>
+                    <p>For new patients, we recommend calling our office directly to set up your first appointment and complete necessary paperwork.</p>
+                </div>
+            </div>
+            
+            <div class="faq-item" data-category="appointments">
+                <div class="faq-question">What should I bring to my appointment?</div>
+                <div class="faq-answer">
+                    <p>Please bring the following items to your appointment:</p>
+                    <ul>
+                        <li>Photo ID (driver's license, passport, etc.)</li>
+                        <li>Insurance card</li>
+                        <li>List of current medications</li>
+                        <li>Medical records or previous test results (if applicable)</li>
+                        <li>Payment method for co-pays or deductibles</li>
+                        <li>Completed new patient forms (if you're a new patient)</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="faq-item" data-category="appointments">
+                <div class="faq-question">How do I cancel or reschedule my appointment?</div>
+                <div class="faq-answer">
+                    <p>To cancel or reschedule your appointment, please notify us at least 24 hours in advance. You can do this by:</p>
+                    <ul>
+                        <li>Logging into your patient portal</li>
+                        <li>Calling our office at (256) 773-403-968</li>
+                        <li>Using our mobile app</li>
+                    </ul>
+                    <p>Please note that late cancellations or no-shows may result in a fee.</p>
+                </div>
+            </div>
+            
+            <div class="faq-item" data-category="insurance">
+                <div class="faq-question">What insurance plans do you accept?</div>
+                <div class="faq-answer">
+                    <p>We accept most major insurance plans, including:</p>
+                    <ul>
+                        <li>Blue Cross Blue Shield</li>
+                        <li>Aetna</li>
+                        <li>Cigna</li>
+                        <li>United Healthcare</li>
+                        <li>Medicare</li>
+                        <li>Medicaid</li>
+                    </ul>
+                    <p>Please contact our billing department at (256) 702-465-907 ext. 2 to verify if we accept your specific insurance plan.</p>
+                </div>
+            </div>
+            
+            <div class="faq-item" data-category="insurance">
+                <div class="faq-question">How do I pay my bill?</div>
+                <div class="faq-answer">
+                    <p>You can pay your bill in several ways:</p>
+                    <ul>
+                        <li>Online through our patient portal</li>
+                        <li>By phone at (256) 702-665-638 ext. 2</li>
+                        <li>By mail to our billing address</li>
+                        <li>In person at our clinic</li>
+                    </ul>
+                    <p>We accept credit cards, debit cards, checks, and cash payments.</p>
+                </div>
+            </div>
+            
+            <div class="faq-item" data-category="services">
+                <div class="faq-question">What services do you offer?</div>
+                <div class="faq-answer">
+                    <p>We offer a comprehensive range of healthcare services, including:</p>
+                    <ul>
+                        <li>Primary care</li>
+                        <li>Specialized care (cardiology, orthopedics, neurology, etc.)</li>
+                        <li>Preventive care and wellness services</li>
+                        <li>Diagnostic services (lab tests, imaging)</li>
+                        <li>Telemedicine consultations</li>
+                        <li>Minor surgical procedures</li>
+                        <li>Physical therapy</li>
+                    </ul>
+                    <p>Visit our <a href="/services">Services page</a> for more detailed information.</p>
+                </div>
+            </div>
+            
+            <div class="faq-item" data-category="telemedicine">
+                <div class="faq-question">How do telemedicine appointments work?</div>
+                <div class="faq-answer">
+                    <p>Telemedicine appointments allow you to consult with our healthcare providers remotely via secure video conferencing. Here's how it works:</p>
+                    <ol>
+                        <li>Schedule a telemedicine appointment through our patient portal, mobile app, or by calling our office</li>
+                        <li>You'll receive a confirmation email with a link to join the video call</li>
+                        <li>At your appointment time, click the link to join the video call from your computer, tablet, or smartphone</li>
+                        <li>The provider will join the call to conduct your consultation</li>
+                        <li>If needed, the provider can send prescriptions to your pharmacy electronically</li>
+                    </ol>
+                    <p>You'll need a reliable internet connection and a device with a camera and microphone for the best experience.</p>
+                </div>
+            </div>
+            
+            <div class="faq-item" data-category="covid">
+                <div class="faq-question">Do you offer COVID-19 testing?</div>
+                <div class="faq-answer">
+                    <p>Yes, we offer COVID-19 testing services, including:</p>
+                    <ul>
+                        <li>PCR tests</li>
+                        <li>Rapid antigen tests</li>
+                        <li>Antibody tests</li>
+                    </ul>
+                    <p>Testing is available by appointment. Please call our dedicated COVID-19 hotline at (212) 555-0123 ext. 3 to schedule a test or for more information about our testing protocols.</p>
+                </div>
+            </div>
+            
+            <div class="faq-item" data-category="covid">
+                <div class="faq-question">What COVID-19 safety measures do you have in place?</div>
+                <div class="faq-answer">
+                    <p>We have implemented comprehensive safety measures to protect our patients and staff, including:</p>
+                    <ul>
+                        <li>Enhanced cleaning and disinfection protocols</li>
+                        <li>Staff wearing appropriate personal protective equipment (PPE)</li>
+                        <li>Social distancing measures in waiting areas</li>
+                        <li>Pre-appointment screening for COVID-19 symptoms</li>
+                        <li>Separate areas for patients with respiratory symptoms</li>
+                        <li>Telemedicine options to reduce in-person visits when appropriate</li>
+                    </ul>
+                    <p>We continue to follow CDC and local health department guidelines to ensure the safety of everyone at our facility.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="contact-support">
+            <h2>Can't Find What You're Looking For?</h2>
+            <p>If you have a question that isn't answered here, our support team is ready to help.</p>
+            <a href="/contact" class="contact-btn">Contact Support</a>
+        </div>
+    </div>
+</section>
+
+<script>
+    // FAQ Toggle
+    document.querySelectorAll('.faq-question').forEach(question => {
+        question.addEventListener('click', () => {
+            const item = question.parentNode;
+            const isActive = item.classList.contains('active');
+            
+            // Close all items
+            document.querySelectorAll('.faq-item').forEach(otherItem => {
+                otherItem.classList.remove('active');
+            });
+            
+            // If the clicked item wasn't active, make it active
+            if (!isActive) {
+                item.classList.add('active');
+            }
+        });
+    });
+    
+    // Category Filtering
+    document.querySelectorAll('.category-btn').forEach(button => {
+        button.addEventListener('click', () => {
+            const category = button.getAttribute('data-category');
+            
+            // Update active button
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            button.classList.add('active');
+            
+            // Filter items
+            document.querySelectorAll('.faq-item').forEach(item => {
+                if (category === 'all' || item.getAttribute('data-category') === category) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+    });
+    
+    // Search Functionality
+    document.getElementById('faqSearch').addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        
+        document.querySelectorAll('.faq-item').forEach(item => {
+            const question = item.querySelector('.faq-question').textContent.toLowerCase();
+            const answer = item.querySelector('.faq-answer').textContent.toLowerCase();
+            
+            if (question.includes(searchTerm) || answer.includes(searchTerm)) {
+                item.style.display = 'block';
+            } else {
+                item.style.display = 'none';
+            }
+        });
+    });
+    
+    // Open first FAQ item by default
+    document.querySelector('.faq-item').classList.add('active');
+</script>
+{% endblock %}

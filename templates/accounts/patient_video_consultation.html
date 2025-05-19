@@ -1,0 +1,838 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Video Consultation - Smart Clinic{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/patient-portal.css' %}">
+<style>
+    .video-container {
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+    
+    .video-grid {
+        display: grid;
+        grid-template-columns: 3fr 1fr;
+        gap: 1.5rem;
+        height: 70vh;
+    }
+    
+    @media (max-width: 992px) {
+        .video-grid {
+            grid-template-columns: 1fr;
+            height: auto;
+        }
+    }
+    
+    .main-video {
+        background: var(--glass-bg);
+        backdrop-filter: blur(12px);
+        border: 1px solid var(--glass-border);
+        border-radius: var(--border-radius);
+        overflow: hidden;
+        position: relative;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .main-video.active {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(74, 107, 255, 0.3);
+    }
+    
+    .video-placeholder {
+        text-align: center;
+        color: var(--dark-color);
+    }
+    
+    .video-placeholder i {
+        font-size: 5rem;
+        color: var(--secondary-color);
+        margin-bottom: 1.5rem;
+    }
+    
+    .video-placeholder h3 {
+        font-size: 1.75rem;
+        margin-bottom: 1rem;
+    }
+    
+    .video-placeholder p {
+        color: var(--secondary-color);
+        max-width: 500px;
+        margin: 0 auto 1.5rem;
+    }
+    
+    .chat-panel {
+        background: var(--glass-bg);
+        backdrop-filter: blur(12px);
+        border: 1px solid var(--glass-border);
+        border-radius: var(--border-radius);
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+    
+    .chat-header {
+        padding: 1rem;
+        border-bottom: 1px solid var(--glass-border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    
+    .chat-title {
+        font-weight: 600;
+    }
+    
+    .chat-messages {
+        flex-grow: 1;
+        padding: 1rem;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .message {
+        max-width: 80%;
+        padding: 0.75rem 1rem;
+        border-radius: 18px;
+        position: relative;
+    }
+    
+    .message.received {
+        align-self: flex-start;
+        background-color: rgba(108, 117, 125, 0.1);
+        border-bottom-left-radius: 4px;
+    }
+    
+    .message.sent {
+        align-self: flex-end;
+        background-color: rgba(74, 107, 255, 0.1);
+        color: var(--primary-dark);
+        border-bottom-right-radius: 4px;
+    }
+    
+    .message-time {
+        font-size: 0.75rem;
+        color: var(--secondary-color);
+        margin-top: 0.25rem;
+        text-align: right;
+    }
+    
+    .chat-input {
+        padding: 1rem;
+        border-top: 1px solid var(--glass-border);
+    }
+    
+    .input-group {
+        display: flex;
+        gap: 0.5rem;
+    }
+    
+    .controls-panel {
+        background: var(--glass-bg);
+        backdrop-filter: blur(12px);
+        border: 1px solid var(--glass-border);
+        border-radius: var(--border-radius);
+        padding: 1.25rem;
+        margin-top: 1.5rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    
+    .control-btn {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        border: none;
+        background-color: var(--glass-bg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        color: var(--dark-color);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+    }
+    
+    .control-btn i {
+        font-size: 1.5rem;
+    }
+    
+    .control-btn:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .control-btn.mute {
+        color: var(--secondary-color);
+    }
+    
+    .control-btn.camera {
+        color: var(--primary-color);
+    }
+    
+    .control-btn.end-call {
+        background-color: var(--danger-color);
+        color: white;
+    }
+    
+    .control-btn.screen {
+        color: var(--info-color);
+    }
+    
+    .control-btn.settings {
+        color: var(--warning-color);
+    }
+    
+    .upcoming-consultations {
+        background: var(--glass-bg);
+        backdrop-filter: blur(12px);
+        border: 1px solid var(--glass-border);
+        border-radius: var(--border-radius);
+        padding: 1.5rem;
+        margin-top: 2rem;
+    }
+    
+    .consultation-card {
+        background: white;
+        border-radius: var(--border-radius);
+        box-shadow: var(--card-shadow);
+        padding: 1.25rem;
+        margin-bottom: 1rem;
+        transition: all var(--transition-speed) cubic-bezier(0.2, 0.8, 0.2, 1);
+        border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+    
+    .consultation-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--hover-shadow);
+    }
+    
+    .consultation-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+    
+    .doctor-avatar {
+        width: 50px;
+        height: 50px;
+        background-color: var(--primary-light);
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        margin-right: 1rem;
+        font-size: 1.25rem;
+    }
+    
+    .consultation-doctor {
+        font-weight: 600;
+        color: var(--dark-color);
+    }
+    
+    .consultation-specialty {
+        font-size: 0.9rem;
+        color: var(--secondary-color);
+    }
+    
+    .consultation-time {
+        display: flex;
+        align-items: center;
+        margin-bottom: 0.75rem;
+        color: var(--dark-color);
+    }
+    
+    .consultation-time i {
+        margin-right: 0.75rem;
+        color: var(--primary-color);
+    }
+    
+    .consultation-status {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 50px;
+        font-size: 0.875rem;
+        margin-bottom: 1rem;
+    }
+    
+    .status-upcoming {
+        background-color: rgba(52, 152, 219, 0.1);
+        color: #3498db;
+    }
+    
+    .status-active {
+        background-color: rgba(46, 204, 113, 0.1);
+        color: #2ecc71;
+    }
+    
+    .status-completed {
+        background-color: rgba(108, 117, 125, 0.1);
+        color: #6c757d;
+    }
+    
+    .action-btns {
+        display: flex;
+        gap: 0.75rem;
+    }
+    
+    .action-btns .btn {
+        flex: 1;
+    }
+    
+    .join-btn .btn {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+        color: white;
+    }
+    
+    .join-btn .btn:hover {
+        background-color: var(--primary-dark);
+        border-color: var(--primary-dark);
+    }
+    
+    .consultation-tabs {
+        margin-bottom: 1.5rem;
+        border-bottom: 1px solid var(--glass-border);
+        display: flex;
+    }
+    
+    .tab {
+        padding: 0.75rem 1.5rem;
+        cursor: pointer;
+        border-bottom: 2px solid transparent;
+        transition: all 0.3s ease;
+        font-weight: 500;
+    }
+    
+    .tab.active {
+        border-bottom-color: var(--primary-color);
+        color: var(--primary-color);
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 3rem;
+        background-color: #f8f9fa;
+        border-radius: var(--border-radius);
+        margin: 2rem 0;
+    }
+    
+    .empty-state i {
+        font-size: 3rem;
+        color: var(--secondary-color);
+        margin-bottom: 1rem;
+    }
+    
+    .empty-state-title {
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+        color: var(--dark-color);
+    }
+    
+    .empty-state-description {
+        color: var(--secondary-color);
+        max-width: 500px;
+        margin: 0 auto;
+    }
+    
+    .active-consultation-banner {
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: var(--border-radius);
+        margin-bottom: 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+        0% { box-shadow: 0 0 0 0 rgba(74, 107, 255, 0.4); }
+        70% { box-shadow: 0 0 0 15px rgba(74, 107, 255, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(74, 107, 255, 0); }
+    }
+    
+    .banner-text {
+        display: flex;
+        align-items: center;
+    }
+    
+    .banner-text i {
+        margin-right: 1rem;
+        font-size: 1.5rem;
+    }
+    
+    .banner-info {
+        font-weight: 600;
+    }
+    
+    .banner-info span {
+        opacity: 0.9;
+        font-weight: normal;
+        margin-left: 0.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="video-container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="page-title">Video Consultation</h1>
+        <div>
+            <a href="{% url 'dashboard:index' %}" class="btn btn-outline-primary">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+    </div>
+    
+    <!-- Active consultation banner (only shown when there's an active consultation) -->
+    {% if active_consultation %}
+    <div class="active-consultation-banner">
+        <div class="banner-text">
+            <i class="fas fa-video"></i>
+            <div class="banner-info">
+                Active consultation with Dr. {{ active_consultation.doctor.user.get_full_name }}
+                <span>Started {{ active_consultation.start_time|timesince }} ago</span>
+            </div>
+        </div>
+        <a href="#" class="btn btn-light" id="rejoinBtn">Rejoin Call</a>
+    </div>
+    {% endif %}
+    
+    <!-- Video and Chat Interface (initially hidden unless in active consultation) -->
+    <div class="video-interface" id="videoInterface" style="display: {% if active_consultation %}block{% else %}none{% endif %};">
+        <div class="video-grid">
+            <div class="main-video active" id="mainVideo">
+                <div class="video-placeholder">
+                    <i class="fas fa-video"></i>
+                    <h3>Preparing Video...</h3>
+                    <p>Your video will start automatically once your camera is connected. Make sure you've granted camera and microphone permissions.</p>
+                    <button class="btn btn-primary" id="setupVideoBtn">
+                        <i class="fas fa-cog"></i> Setup Video
+                    </button>
+                </div>
+            </div>
+            
+            <div class="chat-panel">
+                <div class="chat-header">
+                    <div class="chat-title">Consultation Chat</div>
+                    <div class="chat-actions">
+                        <button class="btn btn-sm btn-outline-secondary" id="clearChatBtn">
+                            <i class="fas fa-eraser"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="chat-messages" id="chatMessages">
+                    <!-- System welcome message -->
+                    <div class="message received">
+                        <div class="message-content">Welcome to your video consultation. You can use this chat to communicate with your doctor.</div>
+                        <div class="message-time">System message</div>
+                    </div>
+                    
+                    <!-- Dynamic messages will be added here -->
+                </div>
+                
+                <div class="chat-input">
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="messageInput" placeholder="Type a message...">
+                        <button class="btn btn-primary" id="sendMessageBtn">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="controls-panel">
+            <button class="control-btn mute" id="muteBtn" title="Mute/Unmute">
+                <i class="fas fa-microphone"></i>
+            </button>
+            <button class="control-btn camera" id="cameraBtn" title="Toggle Camera">
+                <i class="fas fa-video"></i>
+            </button>
+            <button class="control-btn screen" id="screenShareBtn" title="Share Screen">
+                <i class="fas fa-desktop"></i>
+            </button>
+            <button class="control-btn settings" id="settingsBtn" title="Settings">
+                <i class="fas fa-cog"></i>
+            </button>
+            <button class="control-btn end-call" id="endCallBtn" title="End Call">
+                <i class="fas fa-phone-slash"></i>
+            </button>
+        </div>
+    </div>
+    
+    <!-- Upcoming consultations list -->
+    <div class="upcoming-consultations">
+        <div class="consultation-tabs">
+            <div class="tab active" data-tab="upcoming">Upcoming</div>
+            <div class="tab" data-tab="past">Past Consultations</div>
+        </div>
+        
+        <div class="tab-content" id="upcomingConsultations">
+            {% if upcoming_consultations %}
+                {% for consultation in upcoming_consultations %}
+                <div class="consultation-card">
+                    <div class="consultation-header">
+                        <div class="doctor-avatar">
+                            {{ consultation.doctor.user.first_name|first }}{{ consultation.doctor.user.last_name|first }}
+                        </div>
+                        <div>
+                            <div class="consultation-doctor">Dr. {{ consultation.doctor.user.get_full_name }}</div>
+                            <div class="consultation-specialty">{{ consultation.doctor.specialization }}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="consultation-time">
+                        <i class="far fa-calendar-alt"></i>
+                        <span>{{ consultation.date|date:"l, F d, Y" }}</span>
+                    </div>
+                    
+                    <div class="consultation-time">
+                        <i class="far fa-clock"></i>
+                        <span>{{ consultation.start_time|time:"g:i A" }} - {{ consultation.end_time|time:"g:i A" }}</span>
+                    </div>
+                    
+                    <div class="consultation-status status-upcoming">
+                        <i class="fas fa-hourglass-half"></i> Scheduled
+                    </div>
+                    
+                    <div class="action-btns">
+                        {% if is_within_15_minutes %}
+                        <div class="join-btn">
+                            <a href="#" class="btn btn-block join-consultation" data-id="{{ consultation.id }}">
+                                <i class="fas fa-video"></i> Join Now
+                            </a>
+                        </div>
+                        {% endif %}
+                        <a href="{% url 'appointments:detail' consultation.id %}" class="btn btn-outline-primary btn-block">
+                            <i class="fas fa-info-circle"></i> Details
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-calendar-alt"></i>
+                    <h3 class="empty-state-title">No Upcoming Video Consultations</h3>
+                    <p class="empty-state-description">
+                        You don't have any scheduled video consultations. Click below to request a new video consultation with a doctor.
+                    </p>
+                    <a href="{% url 'accounts:patient_doctors' %}" class="btn btn-primary">
+                        <i class="fas fa-video"></i> Request Video Consultation
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+        
+        <div class="tab-content" id="pastConsultations" style="display: none;">
+            {% if past_consultations %}
+                {% for consultation in past_consultations %}
+                <div class="consultation-card">
+                    <div class="consultation-header">
+                        <div class="doctor-avatar">
+                            {{ consultation.doctor.user.first_name|first }}{{ consultation.doctor.user.last_name|first }}
+                        </div>
+                        <div>
+                            <div class="consultation-doctor">Dr. {{ consultation.doctor.user.get_full_name }}</div>
+                            <div class="consultation-specialty">{{ consultation.doctor.specialization }}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="consultation-time">
+                        <i class="far fa-calendar-alt"></i>
+                        <span>{{ consultation.date|date:"l, F d, Y" }}</span>
+                    </div>
+                    
+                    <div class="consultation-time">
+                        <i class="far fa-clock"></i>
+                        <span>{{ consultation.start_time|time:"g:i A" }} - {{ consultation.end_time|time:"g:i A" }}</span>
+                    </div>
+                    
+                    <div class="consultation-status status-completed">
+                        <i class="fas fa-check-circle"></i> Completed
+                    </div>
+                    
+                    <div class="action-btns">
+                        <a href="{% url 'appointments:detail' consultation.id %}" class="btn btn-outline-primary btn-block">
+                            <i class="fas fa-file-medical"></i> View Summary
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-history"></i>
+                    <h3 class="empty-state-title">No Past Video Consultations</h3>
+                    <p class="empty-state-description">
+                        You haven't had any video consultations yet. Once you complete a consultation, it will appear here.
+                    </p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Tab switching functionality
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+        
+        tabs.forEach(tab => {
+            tab.addEventListener('click', function() {
+                // Remove active class from all tabs
+                tabs.forEach(t => t.classList.remove('active'));
+                
+                // Add active class to clicked tab
+                this.classList.add('active');
+                
+                // Hide all tab contents
+                tabContents.forEach(content => {
+                    content.style.display = 'none';
+                });
+                
+                // Show the selected tab content
+                const tabName = this.getAttribute('data-tab');
+                document.getElementById(tabName + 'Consultations').style.display = 'block';
+            });
+        });
+        
+        // Join consultation button functionality
+        const joinButtons = document.querySelectorAll('.join-consultation');
+        joinButtons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                const consultationId = this.getAttribute('data-id');
+                
+                // Show video interface
+                document.getElementById('videoInterface').style.display = 'block';
+                
+                // Scroll to video interface
+                document.getElementById('videoInterface').scrollIntoView({
+                    behavior: 'smooth'
+                });
+                
+                // Simulate joining the call
+                setTimeout(() => {
+                    alert('Connecting to your video consultation...');
+                    
+                    // Here you would typically connect to a real-time service
+                    // For demonstration, we'll just update the UI
+                    document.querySelector('.video-placeholder').innerHTML = `
+                        <video id="demoVideo" autoplay loop muted style="width: 100%; height: 100%; object-fit: cover;">
+                            <source src="{% static 'media/demo-consultation.mp4' %}" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    `;
+                    
+                    // Add doctor video
+                    const smallVideo = document.createElement('div');
+                    smallVideo.style.position = 'absolute';
+                    smallVideo.style.width = '150px';
+                    smallVideo.style.height = '150px';
+                    smallVideo.style.right = '20px';
+                    smallVideo.style.top = '20px';
+                    smallVideo.style.background = '#333';
+                    smallVideo.style.borderRadius = '12px';
+                    smallVideo.style.overflow = 'hidden';
+                    smallVideo.style.boxShadow = '0 5px 15px rgba(0, 0, 0, 0.2)';
+                    smallVideo.style.border = '2px solid white';
+                    smallVideo.style.zIndex = '10';
+                    smallVideo.innerHTML = `
+                        <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: white; font-size: 30px;">
+                            <i class="fas fa-user-md"></i>
+                        </div>
+                    `;
+                    document.getElementById('mainVideo').appendChild(smallVideo);
+                    
+                    // Add a system message to the chat
+                    addMessage('Dr. Johnson has joined the consultation.', 'received', 'System');
+                }, 1000);
+            });
+        });
+        
+        // Rejoin button functionality
+        const rejoinBtn = document.getElementById('rejoinBtn');
+        if (rejoinBtn) {
+            rejoinBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Show video interface
+                document.getElementById('videoInterface').style.display = 'block';
+                
+                // Scroll to video interface
+                document.getElementById('videoInterface').scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        }
+        
+        // Video controls functionality
+        const muteBtn = document.getElementById('muteBtn');
+        const cameraBtn = document.getElementById('cameraBtn');
+        const screenShareBtn = document.getElementById('screenShareBtn');
+        const settingsBtn = document.getElementById('settingsBtn');
+        const endCallBtn = document.getElementById('endCallBtn');
+        
+        // Mute button toggle
+        let muted = false;
+        muteBtn.addEventListener('click', function() {
+            muted = !muted;
+            if (muted) {
+                this.innerHTML = '<i class="fas fa-microphone-slash"></i>';
+                this.style.backgroundColor = 'rgba(108, 117, 125, 0.2)';
+            } else {
+                this.innerHTML = '<i class="fas fa-microphone"></i>';
+                this.style.backgroundColor = 'var(--glass-bg)';
+            }
+        });
+        
+        // Camera button toggle
+        let cameraOff = false;
+        cameraBtn.addEventListener('click', function() {
+            cameraOff = !cameraOff;
+            if (cameraOff) {
+                this.innerHTML = '<i class="fas fa-video-slash"></i>';
+                this.style.backgroundColor = 'rgba(108, 117, 125, 0.2)';
+            } else {
+                this.innerHTML = '<i class="fas fa-video"></i>';
+                this.style.backgroundColor = 'var(--glass-bg)';
+            }
+        });
+        
+        // Screen share button
+        screenShareBtn.addEventListener('click', function() {
+            alert('Screen sharing requested. This would usually prompt you to select which screen or window to share.');
+        });
+        
+        // Settings button
+        settingsBtn.addEventListener('click', function() {
+            alert('Video settings would open here, allowing you to select different cameras, microphones, and adjust video quality.');
+        });
+        
+        // End call button
+        endCallBtn.addEventListener('click', function() {
+            if (confirm('Are you sure you want to end this consultation?')) {
+                document.getElementById('videoInterface').style.display = 'none';
+                alert('Call ended. Thank you for using our video consultation service.');
+                
+                // Reload page to refresh the consultation status
+                // window.location.reload();
+            }
+        });
+        
+        // Chat functionality
+        const messageInput = document.getElementById('messageInput');
+        const sendMessageBtn = document.getElementById('sendMessageBtn');
+        const chatMessages = document.getElementById('chatMessages');
+        
+        // Send message when clicking send button
+        sendMessageBtn.addEventListener('click', sendMessage);
+        
+        // Send message when pressing Enter in the input field
+        messageInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+        
+        function sendMessage() {
+            const message = messageInput.value.trim();
+            if (message) {
+                // Add the sent message to the chat
+                addMessage(message, 'sent');
+                
+                // Clear the input field
+                messageInput.value = '';
+                
+                // Simulate a response after a short delay (in a real app, this would come from the server)
+                setTimeout(() => {
+                    const responses = [
+                        "I can see that. How long have you been experiencing these symptoms?",
+                        "That's good to know. Have you noticed any other changes?",
+                        "I understand. Let me make a note of that.",
+                        "Could you elaborate a bit more on that?",
+                        "Thank you for sharing that information."
+                    ];
+                    const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+                    addMessage(randomResponse, 'received', 'Dr. Johnson');
+                }, 2000);
+            }
+        }
+        
+        function addMessage(content, type, sender = null) {
+            const messageElement = document.createElement('div');
+            messageElement.className = `message ${type}`;
+            
+            // Format the current time
+            const now = new Date();
+            const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            
+            // Set the message content
+            if (type === 'sent') {
+                messageElement.innerHTML = `
+                    <div class="message-content">${content}</div>
+                    <div class="message-time">${timeString}</div>
+                `;
+            } else {
+                messageElement.innerHTML = `
+                    <div class="message-content">${content}</div>
+                    <div class="message-time">${sender ? sender + ' • ' : ''}${timeString}</div>
+                `;
+            }
+            
+            // Add the message to the chat container
+            chatMessages.appendChild(messageElement);
+            
+            // Scroll to the bottom of the chat
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        // Clear chat button
+        const clearChatBtn = document.getElementById('clearChatBtn');
+        clearChatBtn.addEventListener('click', function() {
+            // Remove all messages except the welcome message
+            while (chatMessages.childNodes.length > 1) {
+                chatMessages.removeChild(chatMessages.lastChild);
+            }
+        });
+        
+        // Setup video button
+        const setupVideoBtn = document.getElementById('setupVideoBtn');
+        if (setupVideoBtn) {
+            setupVideoBtn.addEventListener('click', function() {
+                alert('This would normally request access to your camera and microphone.');
+                
+                // Simulate a loading state
+                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Connecting...';
+                this.disabled = true;
+                
+                // After a delay, update to show "connected"
+                setTimeout(() => {
+                    document.querySelector('.video-placeholder').innerHTML = `
+                        <i class="fas fa-check-circle" style="color: #2ecc71;"></i>
+                        <h3>Camera Connected</h3>
+                        <p>You're all set up and ready for your consultation. Your doctor will join soon.</p>
+                    `;
+                }, 2000);
+            });
+        }
+    });
+</script>
+{% endblock %}

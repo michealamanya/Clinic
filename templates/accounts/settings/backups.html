@@ -1,0 +1,565 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Database Backups - Smart Clinic{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/settings.css' %}">
+<style>
+    .backup-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .backup-stat {
+        background-color: var(--card-bg);
+        border-radius: var(--border-radius);
+        padding: 1rem;
+        text-align: center;
+        box-shadow: var(--card-shadow);
+    }
+    
+    .backup-stat-value {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: var(--primary-color);
+    }
+    
+    .backup-stat-label {
+        font-size: 0.9rem;
+        color: var(--light-text);
+    }
+    
+    .backup-list {
+        background-color: var(--card-bg);
+        border-radius: var(--border-radius);
+        box-shadow: var(--card-shadow);
+        margin-bottom: 1.5rem;
+    }
+    
+    .backup-list-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    .backup-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    .backup-table th,
+    .backup-table td {
+        padding: 1rem;
+        text-align: left;
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    .backup-table th {
+        font-weight: 500;
+        color: var(--light-text);
+    }
+    
+    .backup-table tr:last-child td {
+        border-bottom: none;
+    }
+    
+    .backup-table tbody tr:hover {
+        background-color: rgba(52, 152, 219, 0.05);
+    }
+    
+    .backup-actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+    
+    .backup-actions form {
+        display: inline;
+    }
+    
+    .disk-space {
+        background-color: var(--card-bg);
+        border-radius: var(--border-radius);
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: var(--card-shadow);
+    }
+    
+    .space-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+    
+    .space-bar {
+        height: 10px;
+        background-color: var(--border-color);
+        border-radius: 5px;
+        margin-bottom: 0.5rem;
+        overflow: hidden;
+    }
+    
+    .space-used {
+        height: 100%;
+        background: linear-gradient(to right, var(--primary-color), var(--primary-dark));
+        border-radius: 5px;
+    }
+    
+    .space-labels {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.85rem;
+        color: var(--light-text);
+    }
+    
+    .backup-options {
+        background-color: var(--card-bg);
+        border-radius: var(--border-radius);
+        padding: 1.5rem;
+        box-shadow: var(--card-shadow);
+    }
+    
+    .backup-types {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .backup-type {
+        flex: 1;
+        background-color: var(--bg-color);
+        border: 1px solid var(--border-color);
+        border-radius: var(--border-radius);
+        padding: 1rem;
+        text-align: center;
+        cursor: pointer;
+        transition: all var(--transition-speed) ease;
+    }
+    
+    .backup-type:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--hover-shadow);
+    }
+    
+    .backup-type.active {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+    }
+    
+    .backup-type-icon {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+        color: var(--primary-color);
+    }
+    
+    .backup-type-title {
+        font-weight: 500;
+        margin-bottom: 0.25rem;
+    }
+    
+    .backup-type-description {
+        font-size: 0.85rem;
+        color: var(--light-text);
+    }
+    
+    .schedule-options {
+        margin-top: 2rem;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 3rem 1rem;
+    }
+    
+    .empty-state i {
+        font-size: 3rem;
+        color: rgba(52, 152, 219, 0.2);
+        margin-bottom: 1rem;
+    }
+    
+    .empty-state h3 {
+        font-size: 1.25rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .empty-state p {
+        color: var(--light-text);
+        margin-bottom: 1.5rem;
+    }
+    
+    .badge {
+        display: inline-block;
+        padding: 0.25rem 0.5rem;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+    
+    .badge.primary {
+        background-color: rgba(52, 152, 219, 0.1);
+        color: var(--primary-color);
+    }
+    
+    .badge.secondary {
+        background-color: rgba(46, 204, 113, 0.1);
+        color: var(--secondary-color);
+    }
+    
+    .badge.accent {
+        background-color: rgba(155, 89, 182, 0.1);
+        color: var(--accent-color);
+    }
+    
+    .water-animation {
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .water-animation::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(52, 152, 219, 0.1), transparent);
+        animation: water-flow 2s infinite;
+    }
+    
+    @keyframes water-flow {
+        0% { left: -100%; }
+        100% { left: 100%; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="settings-container">
+    <div class="settings-sidebar">
+        <h3 class="settings-nav-title">Settings</h3>
+        <ul class="settings-nav">
+            <li class="settings-nav-item">
+                <a href="{% url 'accounts:settings' %}">
+                    <i class="fas fa-home"></i> Overview
+                </a>
+            </li>
+            <li class="settings-nav-item">
+                <a href="{% url 'accounts:settings_general' %}">
+                    <i class="fas fa-sliders-h"></i> General
+                </a>
+            </li>
+            <li class="settings-nav-item">
+                <a href="{% url 'accounts:settings_appearance' %}">
+                    <i class="fas fa-palette"></i> Appearance
+                </a>
+            </li>
+            <li class="settings-nav-item">
+                <a href="{% url 'accounts:settings_notifications' %}">
+                    <i class="fas fa-bell"></i> Notifications
+                </a>
+            </li>
+            <li class="settings-nav-item">
+                <a href="{% url 'accounts:settings_security' %}">
+                    <i class="fas fa-shield-alt"></i> Security
+                </a>
+            </li>
+            <li class="settings-nav-item">
+                <a href="{% url 'accounts:settings_system_status' %}">
+                    <i class="fas fa-heartbeat"></i> System Status
+                </a>
+            </li>
+            <li class="settings-nav-item active">
+                <a href="{% url 'accounts:settings_backups' %}">
+                    <i class="fas fa-database"></i> Backups
+                </a>
+            </li>
+        </ul>
+    </div>
+    
+    <div class="settings-content">
+        <h1 class="settings-title">Database Backups</h1>
+        
+        <div class="backup-stats">
+            <div class="backup-stat">
+                <div class="backup-stat-value">{{ backups|length }}</div>
+                <div class="backup-stat-label">Total Backups</div>
+            </div>
+            
+            {% if backups %}
+            <div class="backup-stat">
+                <div class="backup-stat-value">{{ backups.0.date|date:"M d, Y" }}</div>
+                <div class="backup-stat-label">Latest Backup</div>
+            </div>
+            {% endif %}
+            
+            <div class="backup-stat">
+                <div class="backup-stat-value">{{ next_scheduled|date:"M d, Y" }}</div>
+                <div class="backup-stat-label">Next Scheduled</div>
+            </div>
+            
+            <div class="backup-stat">
+                <div class="backup-stat-value">{{ space_info.free }}</div>
+                <div class="backup-stat-label">Free Space</div>
+            </div>
+        </div>
+        
+        <div class="disk-space">
+            <div class="space-header">
+                <h2>Disk Space Usage</h2>
+                <div>{{ space_info.used }} used of {{ space_info.total }}</div>
+            </div>
+            
+            <div class="space-bar">
+                <div class="space-used" style="width: {{ space_info.percent_used }}%"></div>
+            </div>
+            
+            <div class="space-labels">
+                <div>0%</div>
+                <div>{{ space_info.percent_used }}% used</div>
+                <div>100%</div>
+            </div>
+        </div>
+        
+        <div class="backup-options">
+            <h2>Create New Backup</h2>
+            
+            <form method="post" action="{% url 'accounts:create_backup' %}">
+                {% csrf_token %}
+                
+                <div class="backup-types">
+                    <div class="backup-type active" data-type="json" id="type-json">
+                        <div class="backup-type-icon">
+                            <i class="fas fa-file-code"></i>
+                        </div>
+                        <div class="backup-type-title">JSON Backup</div>
+                        <div class="backup-type-description">Full data export in JSON format</div>
+                    </div>
+                    
+                    <div class="backup-type" data-type="sql" id="type-sql">
+                        <div class="backup-type-icon">
+                            <i class="fas fa-database"></i>
+                        </div>
+                        <div class="backup-type-title">SQL Backup</div>
+                        <div class="backup-type-description">Full database dump in SQL format</div>
+                    </div>
+                </div>
+                
+                <input type="hidden" name="backup_type" id="backup_type" value="json">
+                
+                <button type="submit" class="btn btn-primary water-ripple">
+                    <i class="fas fa-download"></i> Create Backup Now
+                </button>
+            </form>
+            
+            <div class="schedule-options">
+                <h3>Schedule Automatic Backups</h3>
+                <p>Configure automatic backups to ensure your data is always protected.</p>
+                
+                <form method="post" action="#">
+                    {% csrf_token %}
+                    
+                    <div class="setting-field">
+                        <label for="backup_frequency">Backup Frequency</label>
+                        <select id="backup_frequency" name="backup_frequency" class="form-control">
+                            <option value="daily">Daily</option>
+                            <option value="weekly">Weekly</option>
+                            <option value="monthly">Monthly</option>
+                        </select>
+                    </div>
+                    
+                    <div class="setting-field">
+                        <label for="backup_time">Backup Time</label>
+                        <input type="time" id="backup_time" name="backup_time" class="form-control" value="02:00">
+                        <div class="field-help">Backups will run at low-traffic times for optimal performance</div>
+                    </div>
+                    
+                    <div class="setting-field">
+                        <label for="retention_days">Retention Period (days)</label>
+                        <input type="number" id="retention_days" name="retention_days" class="form-control" value="30" min="1" max="365">
+                        <div class="field-help">Old backups will be automatically deleted after this period</div>
+                    </div>
+                    
+                    <div class="setting-field checkbox-field">
+                        <div class="toggle-switch">
+                            <input type="checkbox" id="enabled" name="enabled" checked>
+                            <label for="enabled" class="toggle-label"></label>
+                        </div>
+                        <label for="enabled">Enable Automatic Backups</label>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary water-ripple">
+                        <i class="fas fa-save"></i> Save Schedule
+                    </button>
+                </form>
+            </div>
+        </div>
+        
+        <div class="backup-list">
+            <div class="backup-list-header">
+                <h2>Backup History</h2>
+                <div class="backup-list-actions">
+                    <button class="btn btn-sm btn-outline" id="refresh-list">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
+                </div>
+            </div>
+            
+            {% if backups %}
+            <div class="table-responsive">
+                <table class="backup-table">
+                    <thead>
+                        <tr>
+                            <th>Filename</th>
+                            <th>Date</th>
+                            <th>Size</th>
+                            <th>Type</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for backup in backups %}
+                        <tr>
+                            <td>{{ backup.filename }}</td>
+                            <td>{{ backup.date|date:"M d, Y g:i A" }}</td>
+                            <td>{{ backup.size }}</td>
+                            <td>
+                                {% if backup.filename|slice:"-4:" == "json" %}
+                                    <span class="badge primary">JSON</span>
+                                {% elif backup.filename|slice:"-3:" == "sql" %}
+                                    <span class="badge secondary">SQL</span>
+                                {% elif backup.filename|slice:"-6:" == "sqlite" %}
+                                    <span class="badge accent">SQLite</span>
+                                {% else %}
+                                    <span class="badge">Other</span>
+                                {% endif %}
+                            </td>
+                            <td class="backup-actions">
+                                <a href="{% url 'accounts:download_backup' backup.filename %}" class="btn btn-sm btn-outline" title="Download">
+                                    <i class="fas fa-download"></i>
+                                </a>
+                                
+                                <form method="post" action="{% url 'accounts:restore_backup' backup.filename %}" onsubmit="return confirm('Are you sure you want to restore this backup? Current data will be overwritten.');">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-outline" title="Restore">
+                                        <i class="fas fa-undo"></i>
+                                    </button>
+                                </form>
+                                
+                                <form method="post" action="{% url 'accounts:delete_backup' backup.filename %}" onsubmit="return confirm('Are you sure you want to delete this backup? This cannot be undone.');">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <i class="fas fa-database"></i>
+                <h3>No backups found</h3>
+                <p>You haven't created any backups yet. Create your first backup to protect your data.</p>
+                <button class="btn btn-primary water-animation" id="create-first-backup">
+                    <i class="fas fa-download"></i> Create Your First Backup
+                </button>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Backup type selector
+        const backupTypes = document.querySelectorAll('.backup-type');
+        const backupTypeInput = document.getElementById('backup_type');
+        
+        backupTypes.forEach(type => {
+            type.addEventListener('click', function() {
+                // Remove active class from all types
+                backupTypes.forEach(t => t.classList.remove('active'));
+                
+                // Add active class to clicked type
+                this.classList.add('active');
+                
+                // Update hidden input value
+                backupTypeInput.value = this.dataset.type;
+            });
+        });
+        
+        // Create first backup button
+        const createFirstBackupBtn = document.getElementById('create-first-backup');
+        if (createFirstBackupBtn) {
+            createFirstBackupBtn.addEventListener('click', function() {
+                // Create a form and submit it
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '{% url "accounts:create_backup" %}';
+                
+                const csrfInput = document.createElement('input');
+                csrfInput.type = 'hidden';
+                csrfInput.name = 'csrfmiddlewaretoken';
+                csrfInput.value = '{{ csrf_token }}';
+                
+                const typeInput = document.createElement('input');
+                typeInput.type = 'hidden';
+                typeInput.name = 'backup_type';
+                typeInput.value = 'json';
+                
+                form.appendChild(csrfInput);
+                form.appendChild(typeInput);
+                document.body.appendChild(form);
+                form.submit();
+            });
+        }
+        
+        // Refresh button
+        const refreshButton = document.getElementById('refresh-list');
+        if (refreshButton) {
+            refreshButton.addEventListener('click', function() {
+                window.location.reload();
+            });
+        }
+        
+        // Water ripple effect on buttons
+        document.querySelectorAll('.water-ripple').forEach(button => {
+            button.addEventListener('click', function(e) {
+                const rect = button.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                const ripple = document.createElement('span');
+                ripple.style.cssText = `
+                    position: absolute;
+                    background: rgba(255, 255, 255, 0.7);
+                    border-radius: 50%;
+                    pointer-events: none;
+                    width: 10px;
+                    height: 10px;
+                    top: ${y}px;
+                    left: ${x}px;
+                    transform: translate(-50%, -50%) scale(0);
+                    animation: ripple 0.6s linear;
+                `;
+                
+                button.appendChild(ripple);
+                
+                setTimeout(() => {
+                    ripple.remove();
+                }, 600);
+            });
+        });
+    });
+</script>
+{% endblock %}

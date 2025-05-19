@@ -1,0 +1,188 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Appearance Settings - Smart Clinic{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/settings.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="settings-container">
+    <div class="settings-sidebar">
+        <h3 class="settings-nav-title">Settings</h3>
+        <ul class="settings-nav">
+            <li class="settings-nav-item">
+                <a href="{% url 'accounts:settings' %}">
+                    <i class="fas fa-home"></i> Overview
+                </a>
+            </li>
+            <li class="settings-nav-item">
+                <a href="{% url 'accounts:settings_general' %}">
+                    <i class="fas fa-sliders-h"></i> General
+                </a>
+            </li>
+            <li class="settings-nav-item active">
+                <a href="{% url 'accounts:settings_appearance' %}">
+                    <i class="fas fa-palette"></i> Appearance
+                </a>
+            </li>
+            <li class="settings-nav-item">
+                <a href="{% url 'accounts:settings_notifications' %}">
+                    <i class="fas fa-bell"></i> Notifications
+                </a>
+            </li>
+            <li class="settings-nav-item">
+                <a href="{% url 'accounts:settings_security' %}">
+                    <i class="fas fa-shield-alt"></i> Security
+                </a>
+            </li>
+        </ul>
+    </div>
+    
+    <div class="settings-content">
+        <h1 class="settings-title">Appearance Settings</h1>
+        
+        <div class="settings-form-container">
+            <form method="post" enctype="multipart/form-data" class="settings-form">
+                {% csrf_token %}
+                
+                <div class="settings-section">
+                    <h2 class="settings-section-title">Branding</h2>
+                    
+                    <div class="setting-field">
+                        <label for="clinic_logo">Clinic Logo</label>
+                        {% if settings.clinic_logo %}
+                        <div class="current-logo">
+                            <img src="{{ settings.clinic_logo.url }}" alt="Current logo">
+                            <p class="logo-info">Current logo</p>
+                        </div>
+                        {% endif %}
+                        <input type="file" id="clinic_logo" name="clinic_logo" class="form-control" accept="image/*">
+                        <div class="field-help">Recommended size: 200x60px</div>
+                    </div>
+                </div>
+                
+                <div class="settings-section">
+                    <h2 class="settings-section-title">Theme Colors</h2>
+                    
+                    <div class="color-preview-panel">
+                        <div class="color-preview">
+                            <div class="color-sample primary-sample" id="primary-sample"></div>
+                            <div class="color-value" id="primary-value">{{ settings.primary_color|default:'#3498db' }}</div>
+                        </div>
+                        <div class="color-preview">
+                            <div class="color-sample secondary-sample" id="secondary-sample"></div>
+                            <div class="color-value" id="secondary-value">{{ settings.secondary_color|default:'#2ecc71' }}</div>
+                        </div>
+                        <div class="color-preview">
+                            <div class="color-sample accent-sample" id="accent-sample"></div>
+                            <div class="color-value" id="accent-value">{{ settings.accent_color|default:'#9b59b6' }}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-field">
+                        <label for="primary_color">Primary Color</label>
+                        <input type="color" id="primary_color" name="primary_color" class="form-control color-picker" value="{{ settings.primary_color|default:'#3498db' }}">
+                        <div class="field-help">Main color used throughout the site</div>
+                    </div>
+                    
+                    <div class="setting-field">
+                        <label for="secondary_color">Secondary Color</label>
+                        <input type="color" id="secondary_color" name="secondary_color" class="form-control color-picker" value="{{ settings.secondary_color|default:'#2ecc71' }}">
+                        <div class="field-help">Used for success messages and secondary buttons</div>
+                    </div>
+                    
+                    <div class="setting-field">
+                        <label for="accent_color">Accent Color</label>
+                        <input type="color" id="accent_color" name="accent_color" class="form-control color-picker" value="{{ settings.accent_color|default:'#9b59b6' }}">
+                        <div class="field-help">Used for highlighting and special elements</div>
+                    </div>
+                    
+                    <div class="setting-field checkbox-field">
+                        <div class="toggle-switch">
+                            <input type="checkbox" id="enable_dark_mode" name="enable_dark_mode" 
+                                   {% if settings.enable_dark_mode|default:False %}checked{% endif %}>
+                            <label for="enable_dark_mode" class="toggle-label"></label>
+                        </div>
+                        <label for="enable_dark_mode">Enable Dark Mode</label>
+                        <div class="field-help">Use dark theme as the default color scheme</div>
+                    </div>
+                </div>
+                
+                <div class="settings-section">
+                    <h2 class="settings-section-title">Custom CSS</h2>
+                    
+                    <div class="setting-field">
+                        <label for="custom_css">Custom CSS</label>
+                        <textarea id="custom_css" name="custom_css" class="form-control code-editor" rows="8">{{ settings.custom_css|default:'' }}</textarea>
+                        <div class="field-help">Add custom CSS to customize the appearance further</div>
+                    </div>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary water-ripple">
+                        <i class="fas fa-save"></i> Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Live preview of color changes
+    const updateColorPreview = () => {
+        const primaryColor = document.getElementById('primary_color').value;
+        const secondaryColor = document.getElementById('secondary_color').value;
+        const accentColor = document.getElementById('accent_color').value;
+        
+        document.getElementById('primary-sample').style.backgroundColor = primaryColor;
+        document.getElementById('secondary-sample').style.backgroundColor = secondaryColor;
+        document.getElementById('accent-sample').style.backgroundColor = accentColor;
+        
+        document.getElementById('primary-value').textContent = primaryColor;
+        document.getElementById('secondary-value').textContent = secondaryColor;
+        document.getElementById('accent-value').textContent = accentColor;
+    };
+    
+    // Initialize preview
+    updateColorPreview();
+    
+    // Update preview when colors change
+    document.getElementById('primary_color').addEventListener('input', updateColorPreview);
+    document.getElementById('secondary_color').addEventListener('input', updateColorPreview);
+    document.getElementById('accent_color').addEventListener('input', updateColorPreview);
+    
+    // Add ripple effect to button
+    document.querySelectorAll('.water-ripple').forEach(button => {
+        button.addEventListener('click', function(e) {
+            const rect = button.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            const ripple = document.createElement('span');
+            ripple.style.cssText = `
+                position: absolute;
+                background: rgba(255, 255, 255, 0.7);
+                border-radius: 50%;
+                pointer-events: none;
+                width: 10px;
+                height: 10px;
+                top: ${y}px;
+                left: ${x}px;
+                transform: translate(-50%, -50%) scale(0);
+                animation: ripple 0.6s linear;
+            `;
+            
+            button.appendChild(ripple);
+            
+            setTimeout(() => {
+                ripple.remove();
+            }, 600);
+        });
+    });
+</script>
+{% endblock %}

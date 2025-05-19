@@ -1,0 +1,160 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Appointments - Smart Clinic{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/appointments.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="appointments-header slide-up">
+    <h1>Appointments</h1>
+    <div class="header-actions">
+        <a href="{% url 'appointments:create' %}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> New Appointment
+        </a>
+    </div>
+</div>
+
+<div class="filters-container slide-up" style="animation-delay: 0.1s;">
+    <form method="get" class="filters-form">
+        <div class="form-group">
+            <label for="date" class="form-label">Date</label>
+            <input type="date" id="date" name="date" class="form-control" value="{{ request.GET.date }}">
+        </div>
+        
+        <div class="form-group">
+            <label for="doctor" class="form-label">Doctor</label>
+            <select id="doctor" name="doctor" class="form-control">
+                <option value="">All Doctors</option>
+                {% for doctor in doctors %}
+                <option value="{{ doctor.id }}" {% if request.GET.doctor == doctor.id|stringformat:"s" %}selected{% endif %}>
+                    Dr. {{ doctor.user.get_full_name }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="status" class="form-label">Status</label>
+            <select id="status" name="status" class="form-control">
+                <option value="">All Statuses</option>
+                <option value="scheduled" {% if request.GET.status == 'scheduled' %}selected{% endif %}>Scheduled</option>
+                <option value="confirmed" {% if request.GET.status == 'confirmed' %}selected{% endif %}>Confirmed</option>
+                <option value="completed" {% if request.GET.status == 'completed' %}selected{% endif %}>Completed</option>
+                <option value="cancelled" {% if request.GET.status == 'cancelled' %}selected{% endif %}>Cancelled</option>
+                <option value="no_show" {% if request.GET.status == 'no_show' %}selected{% endif %}>No Show</option>
+            </select>
+        </div>
+        
+        <button type="submit" class="btn btn-primary filter-btn">
+            <i class="fas fa-filter"></i> Filter
+        </button>
+        
+        <a href="{% url 'appointments:list' %}" class="btn btn-outline">
+            <i class="fas fa-sync"></i> Reset
+        </a>
+    </form>
+</div>
+
+<div class="card slide-up" style="animation-delay: 0.2s;">
+    {% if appointments %}
+        <div class="appointments-list">
+            {% for appointment in appointments %}
+            <div class="appointment-card">
+                <div class="appointment-header">
+                    <div class="appointment-date">
+                        <i class="far fa-calendar-alt"></i> {{ appointment.date|date:"D, M d, Y" }}
+                    </div>
+                    <div class="appointment-status status-{{ appointment.status }}">
+                        {{ appointment.get_status_display }}
+                    </div>
+                </div>
+                
+                <div class="appointment-body">
+                    <div class="appointment-time">
+                        <i class="far fa-clock"></i> {{ appointment.start_time|time:"g:i A" }} - {{ appointment.end_time|time:"g:i A" }}
+                    </div>
+                    
+                    <div class="appointment-patient">
+                        <i class="fas fa-user-injured"></i> {{ appointment.patient }}
+                    </div>
+                    
+                    <div class="appointment-doctor">
+                        <i class="fas fa-user-md"></i> Dr. {{ appointment.doctor.user.get_full_name }}
+                    </div>
+                    
+                    {% if appointment.appointment_type %}
+                    <div class="appointment-type">
+                        <i class="fas fa-tag"></i> {{ appointment.appointment_type.name }}
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <div class="appointment-actions">
+                    <a href="{% url 'appointments:detail' appointment.pk %}" class="btn btn-sm btn-outline">
+                        <i class="fas fa-eye"></i> View
+                    </a>
+                    <a href="{% url 'appointments:edit' appointment.pk %}" class="btn btn-sm btn-outline">
+                        <i class="fas fa-edit"></i> Edit
+                    </a>
+                    <a href="{% url 'appointments:cancel' appointment.pk %}" class="btn btn-sm btn-danger">
+                        <i class="fas fa-times"></i> Cancel
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div class="pagination">
+            <span class="step-links">
+                {% if appointments.has_previous %}
+                    <a href="?page=1{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">&laquo; first</a>
+                    <a href="?page={{ appointments.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">previous</a>
+                {% endif %}
+        
+                <span class="current">
+                    Page {{ appointments.number }} of {{ appointments.paginator.num_pages }}
+                </span>
+        
+                {% if appointments.has_next %}
+                    <a href="?page={{ appointments.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">next</a>
+                    <a href="?page={{ appointments.paginator.num_pages }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">last &raquo;</a>
+                {% endif %}
+            </span>
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <i class="fas fa-calendar-times"></i>
+            <h3 class="empty-state-title">No Appointments Found</h3>
+            <p class="empty-state-description">There are no appointments matching your filters.</p>
+            <div class="empty-state-actions">
+                <a href="{% url 'appointments:list' %}" class="btn btn-outline">
+                    <i class="fas fa-sync"></i> Reset Filters
+                </a>
+                <a href="{% url 'appointments:create' %}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Schedule Appointment
+                </a>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Auto-submit filter form when date or dropdown changes
+    document.getElementById('date').addEventListener('change', function() {
+        document.querySelector('.filters-form').submit();
+    });
+    
+    document.getElementById('doctor').addEventListener('change', function() {
+        document.querySelector('.filters-form').submit();
+    });
+    
+    document.getElementById('status').addEventListener('change', function() {
+        document.querySelector('.filters-form').submit();
+    });
+</script>
+{% endblock %}

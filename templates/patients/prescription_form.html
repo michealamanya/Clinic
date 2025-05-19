@@ -1,0 +1,186 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ title }} - Smart Clinic{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/forms.css' %}">
+<style>
+    .glass-card {
+        background: var(--glass-bg);
+        backdrop-filter: blur(12px);
+        border: 1px solid var(--glass-border);
+        border-radius: var(--card-radius);
+        box-shadow: var(--glass-shadow);
+        transition: all 0.3s ease;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .glass-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+    }
+    
+    .form-section-title {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        padding-bottom: 0.75rem;
+        margin-bottom: 1.5rem;
+        font-size: 1.2rem;
+        color: var(--primary-color);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="form-header">
+        <h1 class="form-title slide-up">{{ title }}</h1>
+        <p class="form-subtitle slide-up" style="animation-delay: 0.1s;">
+            Patient: {{ patient.get_full_name|default:patient }} (ID: {{ patient.id }})
+        </p>
+    </div>
+    
+    <div class="form-container slide-up" style="animation-delay: 0.2s;">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            {% if form.errors %}
+            <div class="alert alert-danger">
+                <p>Please correct the errors below:</p>
+                {{ form.errors }}
+            </div>
+            {% endif %}
+            
+            <div class="glass-card">
+                <h3 class="form-section-title">
+                    <i class="fas fa-prescription-bottle-alt"></i> Medication Details
+                </h3>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="{{ form.medication_name.id_for_label }}" class="form-label">Medication Name</label>
+                            {{ form.medication_name }}
+                            {% if form.medication_name.errors %}
+                            <div class="error">{{ form.medication_name.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="{{ form.medical_record.id_for_label }}" class="form-label">Related Medical Record</label>
+                            {{ form.medical_record }}
+                            {% if form.medical_record.errors %}
+                            <div class="error">{{ form.medical_record.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="{{ form.dosage.id_for_label }}" class="form-label">Dosage</label>
+                            {{ form.dosage }}
+                            {% if form.dosage.errors %}
+                            <div class="error">{{ form.dosage.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="{{ form.frequency.id_for_label }}" class="form-label">Frequency</label>
+                            {{ form.frequency }}
+                            {% if form.frequency.errors %}
+                            <div class="error">{{ form.frequency.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="glass-card">
+                <h3 class="form-section-title">
+                    <i class="fas fa-calendar-alt"></i> Duration
+                </h3>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="{{ form.start_date.id_for_label }}" class="form-label">Start Date</label>
+                            {{ form.start_date }}
+                            {% if form.start_date.errors %}
+                            <div class="error">{{ form.start_date.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="{{ form.end_date.id_for_label }}" class="form-label">End Date (Optional)</label>
+                            {{ form.end_date }}
+                            {% if form.end_date.errors %}
+                            <div class="error">{{ form.end_date.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ form.instructions.id_for_label }}" class="form-label">Instructions</label>
+                    {{ form.instructions }}
+                    {% if form.instructions.errors %}
+                    <div class="error">{{ form.instructions.errors }}</div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            {{ form.patient }}
+            
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Save Prescription
+                </button>
+                <a href="{% url 'patients:detail' patient.id %}" class="btn btn-outline">
+                    <i class="fas fa-times"></i> Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Add animation effects
+    document.addEventListener('DOMContentLoaded', function() {
+        // Glass card animations
+        document.querySelectorAll('.glass-card').forEach((card, index) => {
+            card.style.opacity = 0;
+            card.style.transform = 'translateY(20px)';
+            setTimeout(() => {
+                card.style.opacity = 1;
+                card.style.transform = 'translateY(0)';
+            }, 300 + (index * 150));
+        });
+        
+        // Add ripple effect on hover
+        document.querySelectorAll('.glass-card').forEach(card => {
+            card.addEventListener('mouseenter', function(e) {
+                const ripple = document.createElement('div');
+                ripple.className = 'water-ripple-effect';
+                ripple.style.left = '50%';
+                ripple.style.top = '50%';
+                this.appendChild(ripple);
+                
+                setTimeout(() => {
+                    ripple.remove();
+                }, 1000);
+            });
+        });
+    });
+</script>
+{% endblock %}

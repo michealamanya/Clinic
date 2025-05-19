@@ -1,0 +1,403 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ patient }} - Patient Details{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/patients.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="patient-header slide-up">
+    <div class="patient-avatar">
+        {{ patient.first_name|first }}{{ patient.last_name|first }}
+    </div>
+    
+    <div class="patient-info">
+        <h1 class="patient-name">{{ patient.first_name }} {{ patient.last_name }}</h1>
+        
+        <div class="patient-details">
+            <div class="patient-detail">
+                <i class="fas fa-birthday-cake"></i>
+                <span>{{ patient.date_of_birth|date:"M d, Y" }} ({{ patient.get_age }} years)</span>
+            </div>
+            
+            <div class="patient-detail">
+                <i class="fas fa-venus-mars"></i>
+                <span>{{ patient.get_gender_display }}</span>
+            </div>
+            
+            {% if patient.blood_type %}
+            <div class="patient-detail">
+                <i class="fas fa-tint"></i>
+                <span>Blood Type: {{ patient.blood_type }}</span>
+            </div>
+            {% endif %}
+            
+            <div class="patient-detail">
+                <i class="fas fa-phone"></i>
+                <span>{{ patient.phone }}</span>
+            </div>
+            
+            {% if patient.email %}
+            <div class="patient-detail">
+                <i class="fas fa-envelope"></i>
+                <span>{{ patient.email }}</span>
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="patient-actions">
+            <a href="{% url 'patients:edit' patient.pk %}" class="btn btn-outline">
+                <i class="fas fa-edit"></i> Edit
+            </a>
+            <a href="{% url 'appointments:create' %}?patient_id={{ patient.pk }}" class="btn btn-primary">
+                <i class="fas fa-calendar-plus"></i> New Appointment
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="tabs slide-up" style="animation-delay: 0.1s;">
+    <div class="tab active" data-tab="overview">Overview</div>
+    <div class="tab" data-tab="medical-records">Medical Records</div>
+    <div class="tab" data-tab="prescriptions">Prescriptions</div>
+    <div class="tab" data-tab="appointments">Appointments</div>
+    <div class="tab" data-tab="documents">Documents</div>
+</div>
+
+<div class="tab-content active" id="overview">
+    <div class="patient-stats slide-up" style="animation-delay: 0.2s;">
+        <div class="stat-box">
+            <div class="stat-value">{{ medical_records.count }}</div>
+            <div class="stat-label">Medical Records</div>
+        </div>
+        
+        <div class="stat-box">
+            <div class="stat-value">{{ prescriptions.count }}</div>
+            <div class="stat-label">Prescriptions</div>
+        </div>
+        
+        <div class="stat-box">
+            <div class="stat-value">{{ patient.appointments.count }}</div>
+            <div class="stat-label">Appointments</div>
+        </div>
+    </div>
+    
+    <div class="row slide-up" style="animation-delay: 0.3s;">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Personal Information</h2>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Address</label>
+                    <p>{{ patient.address }}</p>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Emergency Contact</label>
+                    {% if patient.emergency_contact_name %}
+                    <p>{{ patient.emergency_contact_name }} - {{ patient.emergency_contact_phone }}</p>
+                    {% else %}
+                    <p>No emergency contact provided</p>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Insurance</label>
+                    {% if patient.insurance_provider %}
+                    <p>{{ patient.insurance_provider }} - Policy #{{ patient.insurance_policy_number }}</p>
+                    {% else %}
+                    <p>No insurance information provided</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Recent Medical Record</h2>
+                    <a href="{% url 'patients:medical_record_create' patient.pk %}" class="btn btn-outline">
+                        <i class="fas fa-plus"></i> Add Record
+                    </a>
+                </div>
+                
+                {% if medical_records %}
+                {% with record=medical_records.0 %}
+                <div class="medical-record-body">
+                    <div class="medical-record-section">
+                        <div class="medical-record-label">Date</div>
+                        <div class="medical-record-value">{{ record.date|date:"F d, Y" }}</div>
+                    </div>
+                    
+                    <div class="medical-record-section">
+                        <div class="medical-record-label">Diagnosis</div>
+                        <div class="medical-record-value">{{ record.diagnosis }}</div>
+                    </div>
+                    
+                    <div class="medical-record-section">
+                        <div class="medical-record-label">Treatment</div>
+                        <div class="medical-record-value">{{ record.treatment }}</div>
+                    </div>
+                </div>
+                {% endwith %}
+                {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-file-medical"></i>
+                    <h3 class="empty-state-title">No Medical Records</h3>
+                    <p class="empty-state-description">There are no medical records for this patient yet.</p>
+                    <a href="{% url 'patients:medical_record_create' patient.pk %}" class="btn btn-primary">
+                        Add Medical Record
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="tab-content" id="medical-records">
+    <div class="card slide-up">
+        <div class="card-header">
+            <h2 class="card-title">Medical Records</h2>
+            <a href="{% url 'patients:medical_record_create' patient.pk %}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Add Record
+            </a>
+        </div>
+        
+        {% if medical_records %}
+        <div class="medical-records-list">
+            {% for record in medical_records %}
+            <div class="medical-record slide-up" style="animation-delay: {{ forloop.counter0|floatformat:1 }}s">
+                <div class="medical-record-header">
+                    <div class="medical-record-date">
+                        <i class="far fa-calendar-alt"></i> {{ record.date|date:"F d, Y" }}
+                    </div>
+                    <div class="medical-record-actions">
+                        <a href="{% url 'patients:medical_record_edit' record.pk %}" class="btn btn-sm btn-outline">
+                            <i class="fas fa-edit"></i> Edit
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="medical-record-body">
+                    <div class="medical-record-section">
+                        <div class="medical-record-label">Diagnosis</div>
+                        <div class="medical-record-value">{{ record.diagnosis }}</div>
+                    </div>
+                    
+                    <div class="medical-record-section">
+                        <div class="medical-record-label">Treatment</div>
+                        <div class="medical-record-value">{{ record.treatment }}</div>
+                    </div>
+                    
+                    {% if record.notes %}
+                    <div class="medical-record-section">
+                        <div class="medical-record-label">Notes</div>
+                        <div class="medical-record-value">{{ record.notes }}</div>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                {% if record.follow_up_required %}
+                <div class="medical-record-footer">
+                    <span class="follow-up-tag">
+                        <i class="fas fa-calendar-check"></i> 
+                        Follow-up: {{ record.follow_up_date|date:"M d, Y" }}
+                    </span>
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <i class="fas fa-file-medical"></i>
+            <h3 class="empty-state-title">No Medical Records</h3>
+            <p class="empty-state-description">There are no medical records for this patient yet.</p>
+            <a href="{% url 'patients:medical_record_create' patient.pk %}" class="btn btn-primary">
+                Add Medical Record
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="tab-content" id="prescriptions">
+    <div class="card slide-up">
+        <div class="card-header">
+            <h2 class="card-title">Prescriptions</h2>
+            <a href="{% url 'patients:prescription_create' patient.pk %}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Add Prescription
+            </a>
+        </div>
+        
+        {% if prescriptions %}
+        <div class="prescriptions-list">
+            {% for prescription in prescriptions %}
+            <div class="prescription slide-up" style="animation-delay: {{ forloop.counter0|floatformat:1 }}s">
+                <div class="prescription-header">
+                    <div class="prescription-name">{{ prescription.medication_name }}</div>
+                    <div class="prescription-dates">
+                        {{ prescription.start_date|date:"M d, Y" }}
+                        {% if prescription.end_date %} - {{ prescription.end_date|date:"M d, Y" }}{% endif %}
+                    </div>
+                </div>
+                
+                <div class="prescription-details">
+                    <div class="prescription-detail">
+                        <div class="prescription-label">Dosage</div>
+                        <div class="prescription-value">{{ prescription.dosage }}</div>
+                    </div>
+                    
+                    <div class="prescription-detail">
+                        <div class="prescription-label">Frequency</div>
+                        <div class="prescription-value">{{ prescription.frequency }}</div>
+                    </div>
+                </div>
+                
+                <div class="prescription-instructions">
+                    {{ prescription.instructions }}
+                </div>
+                
+                <div class="mt-2">
+                    <a href="{% url 'patients:prescription_edit' prescription.pk %}" class="btn btn-sm btn-outline">
+                        <i class="fas fa-edit"></i> Edit
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <i class="fas fa-prescription-bottle-alt"></i>
+            <h3 class="empty-state-title">No Prescriptions</h3>
+            <p class="empty-state-description">There are no prescriptions for this patient yet.</p>
+            <a href="{% url 'patients:prescription_create' patient.pk %}" class="btn btn-primary">
+                Add Prescription
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="tab-content" id="appointments">
+    <div class="card slide-up">
+        <div class="card-header">
+            <h2 class="card-title">Appointments</h2>
+            <a href="{% url 'appointments:create' %}?patient_id={{ patient.pk }}" class="btn btn-primary">
+                <i class="fas fa-calendar-plus"></i> Schedule Appointment
+            </a>
+        </div>
+        
+        {% if patient.appointments.exists %}
+        <div class="timeline">
+            {% for appointment in patient.appointments.all|dictsortreversed:"date" %}
+            <div class="timeline-item slide-up" style="animation-delay: {{ forloop.counter0|floatformat:1 }}s">
+                <div class="timeline-point"></div>
+                <div class="timeline-content">
+                    <div class="timeline-header">
+                        <div class="timeline-title">
+                            Appointment with Dr. {{ appointment.doctor.user.get_full_name }}
+                        </div>
+                        <div class="timeline-date">
+                            {{ appointment.date|date:"M d, Y" }} at {{ appointment.start_time|time:"g:i A" }}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-2">
+                        <span class="appointment-status status-{{ appointment.status }}">
+                            {{ appointment.get_status_display }}
+                        </span>
+                    </div>
+                    
+                    {% if appointment.appointment_type %}
+                    <div class="mb-2">
+                        <strong>Type:</strong> {{ appointment.appointment_type.name }}
+                    </div>
+                    {% endif %}
+                    
+                    {% if appointment.notes %}
+                    <div class="mb-2">
+                        <strong>Notes:</strong> {{ appointment.notes }}
+                    </div>
+                    {% endif %}
+                    
+                    <div>
+                        <a href="{% url 'appointments:detail' appointment.pk %}" class="btn btn-sm btn-outline">
+                            View Details
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <i class="fas fa-calendar-alt"></i>
+            <h3 class="empty-state-title">No Appointments</h3>
+            <p class="empty-state-description">There are no appointments scheduled for this patient yet.</p>
+            <a href="{% url 'appointments:create' %}?patient_id={{ patient.pk }}" class="btn btn-primary">
+                Schedule Appointment
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="tab-content" id="documents">
+    <div class="card slide-up">
+        <div class="card-header">
+            <h2 class="card-title">Documents</h2>
+            <button class="btn btn-primary">
+                <i class="fas fa-upload"></i> Upload Document
+            </button>
+        </div>
+        
+        <div class="empty-state">
+            <i class="fas fa-file-alt"></i>
+            <h3 class="empty-state-title">No Documents</h3>
+            <p class="empty-state-description">There are no documents uploaded for this patient yet.</p>
+            <button class="btn btn-primary">Upload Document</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Tab switching functionality
+    document.querySelectorAll('.tab').forEach(tab => {
+        tab.addEventListener('click', function() {
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            // Add active class to clicked tab
+            this.classList.add('active');
+            
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            const tabId = this.getAttribute('data-tab');
+            document.getElementById(tabId).classList.add('active');
+        });
+    });
+    
+    // Apply staggered animation to medical records
+    const medicalRecords = document.querySelectorAll('.medical-record');
+    medicalRecords.forEach((record, index) => {
+        record.style.animationDelay = `${0.1 + (index * 0.1)}s`;
+    });
+    
+    // Apply staggered animation to prescriptions
+    const prescriptions = document.querySelectorAll('.prescription');
+    prescriptions.forEach((prescription, index) => {
+        prescription.style.animationDelay = `${0.1 + (index * 0.1)}s`;
+    });
+</script>
+{% endblock %}

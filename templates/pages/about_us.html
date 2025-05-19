@@ -1,0 +1,265 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}About Us - Smart Clinic{% endblock %}
+
+{% block extra_css %}
+<style>
+    .about-section {
+        padding: 4rem 0;
+    }
+    
+    .about-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+    
+    .about-header h1 {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+        color: var(--primary-color);
+    }
+    
+    .about-header p {
+        font-size: 1.1rem;
+        max-width: 800px;
+        margin: 0 auto;
+        color: var(--secondary-color);
+    }
+    
+    .about-content {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 1.5rem;
+    }
+    
+    .mission-vision {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        margin-bottom: 4rem;
+    }
+    
+    .mission, .vision {
+        background: #fff;
+        padding: 2rem;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    }
+    
+    .mission h2, .vision h2 {
+        color: var(--primary-color);
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+    }
+    
+    .mission h2 i, .vision h2 i {
+        margin-right: 0.75rem;
+        font-size: 1.5rem;
+    }
+    
+    .team-section {
+        padding: 3rem 0;
+        background-color: #f8f9fa;
+        margin: 2rem -1.5rem;
+        padding: 3rem 1.5rem;
+    }
+    
+    .team-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+    
+    .team-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 2rem;
+    }
+    
+    .team-member {
+        background: #fff;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        transition: transform 0.3s ease;
+    }
+    
+    .team-member:hover {
+        transform: translateY(-10px);
+    }
+    
+    .member-image {
+        height: 250px;
+        overflow: hidden;
+    }
+    
+    .member-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+    }
+    
+    .team-member:hover .member-image img {
+        transform: scale(1.05);
+    }
+    
+    .member-info {
+        padding: 1.5rem;
+        text-align: center;
+    }
+    
+    .member-name {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+    
+    .member-role {
+        color: var(--primary-color);
+        font-weight: 500;
+        margin-bottom: 1rem;
+    }
+    
+    .member-bio {
+        color: var(--secondary-color);
+        margin-bottom: 1rem;
+    }
+    
+    .history-section {
+        margin: 4rem 0;
+    }
+    
+    .history-content {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 3rem;
+        align-items: center;
+    }
+    
+    .history-text h2 {
+        margin-bottom: 1.5rem;
+        color: var(--primary-color);
+    }
+    
+    .history-image {
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+    
+    .history-image img {
+        width: 100%;
+        height: auto;
+        vertical-align: middle;
+    }
+    
+    @media (max-width: 768px) {
+        .mission-vision {
+            grid-template-columns: 1fr;
+        }
+        
+        .history-content {
+            grid-template-columns: 1fr;
+        }
+        
+        .history-image {
+            order: -1;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="about-section">
+    <div class="about-header">
+        <h1>About Smart Clinic</h1>
+        <p>Providing exceptional healthcare services with compassion and expertise since 2005</p>
+    </div>
+    
+    <div class="about-content">
+        <div class="mission-vision">
+            <div class="mission">
+                <h2><i class="fas fa-bullseye"></i> Our Mission</h2>
+                <p>At Smart Clinic, our mission is to provide accessible, high-quality healthcare services to our community. We are committed to treating each patient with dignity, compassion, and respect while delivering personalized care that addresses their unique health needs.</p>
+                <p>We strive to integrate advanced technology with human touch to create a healthcare experience that is both efficient and empathetic.</p>
+            </div>
+            
+            <div class="vision">
+                <h2><i class="fas fa-eye"></i> Our Vision</h2>
+                <p>We envision a future where healthcare is seamlessly integrated into people's lives, providing preventive care, early intervention, and ongoing support to help people live healthier, longer lives.</p>
+                <p>Smart Clinic aims to be at the forefront of healthcare innovation, setting new standards for patient care and medical excellence.</p>
+            </div>
+        </div>
+        
+        <div class="history-section">
+            <h2 class="text-center mb-4">Our History</h2>
+            <div class="history-content">
+                <div class="history-text">
+                    <h3>From Humble Beginnings to Healthcare Excellence</h3>
+                    <p>Smart Clinic was founded in 2005 by Dr. James Wilson with a vision to transform healthcare delivery by making it more accessible, personalized, and technology-driven.</p>
+                    <p>What began as a small family practice has grown into a comprehensive healthcare facility offering a wide range of medical services including primary care, specialized treatments, preventive care, and telehealth services.</p>
+                    <p>Over the years, we have continuously evolved, embracing new technologies and medical advancements to better serve our growing patient community. Our commitment to excellence has earned us recognition and trust from patients and healthcare professionals alike.</p>
+                </div>
+                <div class="history-image">
+                    <img src="{% static 'images/clinic-building.jpg' %}" alt="Smart Clinic Building" onerror="this.src='https://via.placeholder.com/600x400?text=Smart+Clinic'">
+                </div>
+            </div>
+        </div>
+        
+        <div class="team-section">
+            <div class="team-header">
+                <h2>Our Leadership Team</h2>
+                <p>Meet the dedicated professionals guiding Smart Clinic's vision and operations</p>
+            </div>
+            
+            <div class="team-grid">
+                <div class="team-member">
+                    <div class="member-image">
+                        <img src="{% static 'images/team/doctor1.jpg' %}" alt="Dr. James Wilson" onerror="this.src='https://via.placeholder.com/300x300?text=Dr.+James+Wilson'">
+                    </div>
+                    <div class="member-info">
+                        <h3 class="member-name">Dr. Micheal Amanya</h3>
+                        <div class="member-role">Founder & Medical Director</div>
+                        <p class="member-bio">With over 30 years of medical experience, Dr. Wilson leads our clinic with vision and compassion.</p>
+                    </div>
+                </div>
+                
+                <div class="team-member">
+                    <div class="member-image">
+                        <img src="{% static 'images/team/doctor2.jpg' %}" alt="Dr. Sarah Johnson" onerror="this.src='https://via.placeholder.com/300x300?text=Dr.+Sarah+Johnson'">
+                    </div>
+                    <div class="member-info">
+                        <h3 class="member-name">asingwire marvellous</h3>
+                        <div class="member-role">Chief Medical Officer</div>
+                        <p class="member-bio">Dr. Johnson oversees our medical operations and ensures the highest standards of patient care.</p>
+                    </div>
+                </div>
+                
+                <div class="team-member">
+                    <div class="member-image">
+                        <img src="{% static 'images/team/executive1.jpg' %}" alt="Michael Roberts" onerror="this.src='https://via.placeholder.com/300x300?text=Michael+Roberts'">
+                    </div>
+                    <div class="member-info">
+                        <h3 class="member-name">Michael scoffield</h3>
+                        <div class="member-role">Chief Operations Officer</div>
+                        <p class="member-bio">Michael ensures our clinic runs smoothly, focusing on operational excellence and patient satisfaction.</p>
+                    </div>
+                </div>
+                
+                <div class="team-member">
+                    <div class="member-image">
+                        <img src="{% static 'images/team/executive2.jpg' %}" alt="Lisa Chen" onerror="this.src='https://via.placeholder.com/300x300?text=Lisa+Chen'">
+                    </div>
+                    <div class="member-info">
+                        <h3 class="member-name">Lisa asimwe</h3>
+                        <div class="member-role">Chief Technology Officer</div>
+                        <p class="member-bio">Lisa leads our technology initiatives, bringing healthcare innovation to all aspects of our services.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

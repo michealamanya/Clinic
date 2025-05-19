@@ -1,0 +1,240 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Doctor Dashboard - Smart Clinic{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/doctor-dashboard.css' %}">
+{% endblock %}
+
+{% block content %}
+<h1 class="slide-up">Doctor Dashboard</h1>
+<p class="slide-up" style="animation-delay: 0.1s;">Welcome, Dr. {{ user.get_full_name }}!</p>
+
+<section class="stats-container slide-up" style="animation-delay: 0.2s;">
+    <div class="stat-card ripple">
+        <div class="stat-icon">
+            <i class="fas fa-user-injured"></i>
+        </div>
+        <div class="stat-info">
+            <div class="stat-title">Your Patients</div>
+            <div class="stat-value">{{ total_patients }}</div>
+        </div>
+    </div>
+    
+    <div class="stat-card ripple">
+        <div class="stat-icon">
+            <i class="fas fa-calendar-check"></i>
+        </div>
+        <div class="stat-info">
+            <div class="stat-title">Your Appointments</div>
+            <div class="stat-value">{{ total_appointments }}</div>
+        </div>
+    </div>
+    
+    <div class="stat-card ripple">
+        <div class="stat-icon">
+            <i class="fas fa-calendar-day"></i>
+        </div>
+        <div class="stat-info">
+            <div class="stat-title">Today's Appointments</div>
+            <div class="stat-value">{{ todays_appointments.count }}</div>
+        </div>
+    </div>
+</section>
+
+<div class="doctor-dashboard slide-up" style="animation-delay: 0.3s;">
+    <div class="main-section">
+        <div class="schedule-card">
+            <div class="schedule-header">
+                <div class="schedule-date">
+                    <i class="far fa-calendar-alt"></i> Today's Schedule
+                </div>
+                <div class="schedule-navigation">
+                    <button class="schedule-btn">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <button class="schedule-btn">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="schedule-content">
+                {% if todays_appointments %}
+                    {% for appointment in todays_appointments %}
+                    <div class="time-slot has-appointment">
+                        <div class="time-label">
+                            {{ appointment.start_time|time:"g:i A" }}
+                        </div>
+                        <div class="time-appointment">
+                            <div class="appointment-patient">
+                                <strong>{{ appointment.patient }}</strong>
+                            </div>
+                            <div class="appointment-type">
+                                {{ appointment.appointment_type.name|default:"General Consultation" }}
+                            </div>
+                            <div class="mt-2">
+                                <a href="{% url 'appointments:detail' appointment.pk %}" class="btn btn-sm btn-outline">
+                                    View Details
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="time-slot">
+                        <div class="time-label">
+                            9:00 AM
+                        </div>
+                        <div class="time-appointment">
+                            <p>No appointments scheduled.</p>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-header">
+                <h2 class="card-title">Upcoming Appointments</h2>
+                <a href="{% url 'appointments:create' %}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> New Appointment
+                </a>
+            </div>
+            
+            {% if upcoming_appointments %}
+                <div class="activity-list">
+                    {% for appointment in upcoming_appointments %}
+                        <div class="appointment-card">
+                            <div class="appointment-header">
+                                <span class="appointment-time">
+                                    <i class="far fa-calendar-alt"></i> {{ appointment.date|date:"M d, Y" }} at {{ appointment.start_time|time:"g:i A" }}
+                                </span>
+                                <span class="appointment-status status-{{ appointment.status }}">
+                                    {{ appointment.get_status_display }}
+                                </span>
+                            </div>
+                            <div class="appointment-patient">
+                                <i class="fas fa-user-injured"></i> {{ appointment.patient }}
+                            </div>
+                            {% if appointment.appointment_type %}
+                            <div class="appointment-type">
+                                <i class="fas fa-tag"></i> {{ appointment.appointment_type.name }}
+                            </div>
+                            {% endif %}
+                            <div class="mt-2">
+                                <a href="{% url 'appointments:detail' appointment.pk %}" class="btn btn-outline">View Details</a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-center mt-3 mb-3">No upcoming appointments scheduled.</p>
+            {% endif %}
+        </div>
+    </div>
+    
+    <div class="sidebar">
+        <div class="video-call-card">
+            <div class="video-call-background"></div>
+            <div class="video-call-content">
+                <h3 class="video-call-title">Video Consultations</h3>
+                <div class="video-call-actions">
+                    <button class="video-call-btn">
+                        <i class="fas fa-video"></i> Start Call
+                    </button>
+                    <button class="video-call-btn">
+                        <i class="fas fa-cog"></i> Settings
+                    </button>
+                </div>
+                <div class="video-call-info">
+                    You have no scheduled video calls for today.
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Recent Patients</h3>
+                <a href="{% url 'patients:list' %}" class="btn btn-sm btn-outline">View All</a>
+            </div>
+            
+            {% if recent_patients %}
+            <div class="patient-grid">
+                {% for patient in recent_patients %}
+                <div class="patient-card">
+                    <div class="patient-avatar">
+                        {{ patient.first_name|first }}{{ patient.last_name|first }}
+                    </div>
+                    <div class="patient-name">{{ patient.first_name }} {{ patient.last_name }}</div>
+                    <div class="patient-info">{{ patient.get_age }} years</div>
+                    <a href="{% url 'patients:detail' patient.pk %}" class="btn btn-sm btn-outline">View</a>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="text-center mt-3 mb-3">No recent patients.</p>
+            {% endif %}
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-header">
+                <h3 class="card-title">Pending Tasks</h3>
+            </div>
+            
+            <ul class="task-list">
+                <li class="task-item">
+                    <div class="task-icon">
+                        <i class="fas fa-file-medical"></i>
+                    </div>
+                    <div class="task-content">
+                        <div class="task-title">Update patient records</div>
+                        <div class="task-meta">3 records pending review</div>
+                    </div>
+                </li>
+                <li class="task-item">
+                    <div class="task-icon">
+                        <i class="fas fa-clipboard-check"></i>
+                    </div>
+                    <div class="task-content">
+                        <div class="task-title">Prescription renewals</div>
+                        <div class="task-meta">2 renewals pending</div>
+                    </div>
+                </li>
+                <li class="task-item">
+                    <div class="task-icon">
+                        <i class="fas fa-comment-medical"></i>
+                    </div>
+                    <div class="task-content">
+                        <div class="task-title">Patient messages</div>
+                        <div class="task-meta">5 unread messages</div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Apply staggered animation to stat cards
+    const statCards = document.querySelectorAll('.stat-card');
+    statCards.forEach((card, index) => {
+        card.style.animationDelay = `${0.1 + (index * 0.1)}s`;
+    });
+    
+    // Apply staggered animation to appointment cards
+    const appointmentCards = document.querySelectorAll('.appointment-card');
+    appointmentCards.forEach((card, index) => {
+        card.style.animationDelay = `${0.2 + (index * 0.1)}s`;
+    });
+    
+    // Apply staggered animation to patient cards
+    const patientCards = document.querySelectorAll('.patient-card');
+    patientCards.forEach((card, index) => {
+        card.style.animationDelay = `${0.1 + (index * 0.1)}s`;
+    });
+</script>
+{% endblock %}
